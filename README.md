@@ -1,8 +1,6 @@
 # BayesianInference
 
-::::info
 THIS IS A WORK IN PROGRESS!
-::::
 
 ---
 
