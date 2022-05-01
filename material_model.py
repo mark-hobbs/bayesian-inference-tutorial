@@ -10,7 +10,16 @@ class MaterialModel():
     def calculate_stress(self):
         pass
 
-    def plot_stress_strain(self):
+    def stress_strain_response(self):
+        pass
+
+    def generate_synthetic_data(self):
+        pass
+
+    def noise_model(self):
+        """
+        Additive noise model
+        """
         pass
 
 
@@ -24,22 +33,22 @@ class LinearElasticityPerfectPlasticity():
         self.E = E
         self.stress_y = stress_y
 
-    def calculate_stress(self, strain):
+    def calculate_stress(self, E, stress_y, strain):
 
-        stress = []
-        strain_y = self.stress_y / self.E
+        strain_y = stress_y / E
 
+        if strain < strain_y:
+            return E * strain
+        elif strain > strain_y:
+            return stress_y
+
+    def stress_strain_response(self, strain):
+
+        stress = np.zeros(np.size(strain))
         for i in range(len(strain)):
-            if strain[i] < strain_y:
-                tmp = self.E * strain[i]
-            elif strain[i] > strain_y:
-                tmp = self.stress_y
-            stress.append(tmp)
+            stress[i] = self.calculate_stress(self.E, self.stress_y,
+                                              strain[i])
 
-        return stress
-
-    def stress_strain_graph(self, strain):
-        stress = self.calculate_stress(strain)
         plt.plot(strain, stress)
         plt.title("Stress-strain graph")
         plt.xlabel("Strain $\epsilon$")
@@ -51,9 +60,39 @@ class LinearElasticityPerfectPlasticity():
         zero mean and a standard deviation of s_noise
         """
         strain_data = np.random.choice(strain, n_data_points)
-        stress_data = (self.calculate_stress(strain_data)
-                       + (s_noise * np.random.normal(size=n_data_points)))
+        stress_data = np.zeros(n_data_points)
+
+        for i in range(len(stress_data)):
+            stress_data[i] = (self.calculate_stress(self.E, self.stress_y,
+                              strain_data[i]) + (s_noise * np.random.normal()))
+
         return strain_data, stress_data
+
+    def likelihood(self):
+        """
+        Likelihood function for a single stress measurement
+        """
+        return ((1 / (np.sqrt(2 * np.pi()) * s_noise)) * np.exp(((-y
+                - self.calculate_stress(E, stress_y, strain))) ** 2)
+                / (2 * s_noise ** 2))
+
+    def prior(self):
+        """
+        Prior distribution
+        """
+        inv_cov_matrix = np.linalg.inv(cov_matrix)
+        numerator = np.matmul(np.transpose(x_candidate - x_prior),
+                              np.matmul(inv_cov_matrix,  x_candidate - x_prior))
+        return numerator / 2
+
+    def posterior(self):
+        """
+        Calculate the posterior
+        """
+        total = 0
+        for i in range(len(stress_data)):
+            total += self.likelihood()
+        return self.prior() * total
 
 
 class LinearElasticityLinearHardening(MaterialModel):
