@@ -85,14 +85,38 @@ class LinearElasticityPerfectPlasticity():
                               np.matmul(inv_cov_matrix,  x_candidate - x_prior))
         return numerator / 2
 
-    def posterior(self):
+    def posterior(self, strain_data, stress_data):
         """
         Calculate the posterior
+
+        Parameters
+        ----------
+        strain_data : ndarray
+            Experimentally measured strain data
+        
+        stress_data : ndarray
+            Experimental measured stress data
+
+        cov_matrix : ndarray
+            TODO: attribute of the sampler?
+
+        candidate : ndarray
+            TODO: attribute of the sampler?
+
+        Returns
+        -------
+
         """
         total = 0
         for i in range(len(stress_data)):
             total += self.likelihood()
         return self.prior() * total
+
+    def proposal_distribution(self):
+        """
+        Proposal distribution (q)
+        """
+        pass
 
 
 class LinearElasticityLinearHardening(MaterialModel):

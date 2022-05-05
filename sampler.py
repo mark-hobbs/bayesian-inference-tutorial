@@ -1,4 +1,6 @@
 
+import numpy as np
+
 
 class Sampler():
 
@@ -8,13 +10,14 @@ class Sampler():
 
 class MetropolisHastings(Sampler):
 
-    def __init__(self):
-        pass
+    def __init__(self, model):
+        self.model = model
 
     def sample(self):
-        # Draw candidate from the proposal distribution (q)
-        # Accept or reject candidate
-        pass
+        x_p = self.model.draw_proposal()
+        pi_x_i = self.model.calculate_posterior(x_i)
+        pi_x_p = self.model.calculate_posterior(x_p)
+        self.accept_or_reject()
 
     def accept_or_reject(self):
         alpha = self.calculate_acceptance_ratio()
@@ -23,7 +26,7 @@ class MetropolisHastings(Sampler):
         # Reject if u > alpha
 
     def calculate_acceptance_ratio(self):
-        return min(1, pdf_candidate_x, pdf_current_x)
+        return min(1, pi_x_p, pi_x_i)
 
     def generate_uniform_random_number():
-        return numpy.random.uniform(low=0.0, high=1.0)
+        return np.random.uniform(low=0.0, high=1.0)
