@@ -68,24 +68,63 @@ class LinearElasticityPerfectPlasticity():
 
         return strain_data, stress_data
 
-    def likelihood(self):
+    def likelihood(self, s_noise, strain, stress,
+                   candidate_E, candidate_stress_y):
         """
         Likelihood function for a single stress measurement
-        """
-        return ((1 / (np.sqrt(2 * np.pi()) * s_noise)) * np.exp(((-y
-                - self.calculate_stress(E, stress_y, strain))) ** 2)
-                / (2 * s_noise ** 2))
 
-    def prior(self):
+        Parameters
+        ----------
+        s_noise : float
+            Noise in the stress measurement (determined experimentally)
+
+        strain : float
+            Experimentally measured strain
+
+        stress : float
+            Experimentally measured stress
+
+        candidate_E : float
+            Young's modulus candidate
+
+        candidate_stress_y : float
+            Yield stress candidate
+
+        Returns
+        -------
+
+        """
+        return ((1 / (s_noise * np.sqrt(2 * np.pi))) * np.exp(-((stress
+                - self.calculate_stress(candidate_E, candidate_stress_y,
+                                        strain)) ** 2) / (2 * s_noise ** 2)))
+
+    def prior(self, cov_matrix, candidate_x, prior_x):
         """
         Prior distribution
+        
+        Parameters
+        ----------
+        cov_matrix : ndarray
+            Covariance matrix
+
+        candidate_x : ndarray
+            Candidate vector [E, stress_y]
+
+        prior_x : ndarray
+            Prior vector [E, stress_y]
+            TODO: is this variable a prior? or just an initial guess?
+
+        Returns
+        -------
+        
         """
         inv_cov_matrix = np.linalg.inv(cov_matrix)
-        numerator = np.matmul(np.transpose(x_candidate - x_prior),
-                              np.matmul(inv_cov_matrix,  x_candidate - x_prior))
-        return numerator / 2
+        numerator = np.matmul(np.transpose(candidate_x - prior_x),
+                              np.matmul(inv_cov_matrix, candidate_x - prior_x))
+        return np.exp(-numerator / 2)
 
-    def posterior(self, strain_data, stress_data):
+    def posterior(self, strain_data, stress_data, s_noise,
+                  cov_matrix, candidate_x, prior_x):
         """
         Calculate the posterior
 
@@ -109,8 +148,10 @@ class LinearElasticityPerfectPlasticity():
         """
         total = 0
         for i in range(len(stress_data)):
-            total += self.likelihood()
-        return self.prior() * total
+            total += self.likelihood(s_noise,
+                                     strain_data[i-1], stress_data[i-1],
+                                     candidate_x[0], candidate_x[1])
+        return self.prior(cov_matrix, candidate_x, prior_x) * total
 
     def proposal_distribution(self):
         """

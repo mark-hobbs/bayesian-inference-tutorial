@@ -9,14 +9,35 @@ class Sampler():
 
 
 class MetropolisHastings(Sampler):
+    """
+    Metropolis-Hastings sampler class
 
-    def __init__(self, model):
+    Attributes
+    ----------
+    model : MaterialModel
+        Material model class (linear elastic
+                              linear elastic-perfectly plastic
+                              linear elastic-linear hardening
+                              linear elastic-nonlinear hardening)
+
+    data : ndarray
+        Experimental stress-strain data
+
+    Methods
+    -------
+    
+    Notes
+    -----
+    """
+
+    def __init__(self, model, data):
         self.model = model
+        self.data = data
 
     def sample(self):
-        x_p = self.model.draw_proposal()
-        pi_x_i = self.model.calculate_posterior(x_i)
-        pi_x_p = self.model.calculate_posterior(x_p)
+        x_p = self.draw_proposal()
+        pi_x_i = self.calculate_posterior(x_i)
+        pi_x_p = self.calculate_posterior(x_p)
         self.accept_or_reject()
 
     def accept_or_reject(self):
@@ -30,3 +51,22 @@ class MetropolisHastings(Sampler):
 
     def generate_uniform_random_number():
         return np.random.uniform(low=0.0, high=1.0)
+
+    def calculate_posterior(self, model):
+        """
+        Calculate the posterior
+
+        Parameters
+        ----------
+        model : MaterialModel class
+            Material model class
+
+        Returns
+        -------
+
+        """
+        return model.posterior(self.data)
+
+    def draw_proposal(self, model):
+        return model.proposal_distribution()
+
