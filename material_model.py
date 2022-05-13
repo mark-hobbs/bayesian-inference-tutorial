@@ -28,10 +28,36 @@ class LinearElasticity(MaterialModel):
 
 
 class LinearElasticityPerfectPlasticity():
+    """
+    Linear Elasticity-Perfect Plasticity material model class
+
+    Attributes
+    ----------
+    E : float
+        Young's modulus (exact value that we wish to infer from the noisy
+        experimental observations)
+
+    stress_y : float
+        Yield stress (exact value that we wish to infer from the noisy
+        experimental observations)
+
+    s_noise : float
+        Noise in the stress measurement (determined via calibration of the
+        testing machine).
+
+    Methods
+    -------
+    
+    Notes
+    -----
+    """
 
     def __init__(self, E, stress_y):
         self.E = E
         self.stress_y = stress_y
+        # self.s_noise = s_noise  # Should the noise in the stress measurement
+                                  # be an attribute of the material model?
+        self.n_p = 2
 
     def calculate_stress(self, E, stress_y, strain):
 
@@ -43,7 +69,9 @@ class LinearElasticityPerfectPlasticity():
             return stress_y
 
     def stress_strain_response(self, strain):
-
+        """
+        Plot the stress-strain response
+        """
         stress = np.zeros(np.size(strain))
         for i in range(len(strain)):
             stress[i] = self.calculate_stress(self.E, self.stress_y,
@@ -92,6 +120,8 @@ class LinearElasticityPerfectPlasticity():
 
         Returns
         -------
+        likelihood : float
+            Likelihood for a single stress measurement
 
         """
         return ((1 / (s_noise * np.sqrt(2 * np.pi))) * np.exp(-((stress
@@ -142,6 +172,10 @@ class LinearElasticityPerfectPlasticity():
         candidate : ndarray
             TODO: attribute of the sampler?
 
+        s_noise : float
+            Noise in the stress measurement (normal distribution with a zero
+            mean and a standard deviation of s_noise)
+
         Returns
         -------
 
@@ -156,8 +190,20 @@ class LinearElasticityPerfectPlasticity():
     def proposal_distribution(self):
         """
         Proposal distribution (q)
+
+        Parameters
+        ----------
+        n_p : int
+            Number of unknown parameters
+
+        Returns
+        -------
+        gamma : float
+            Parameter that determines the width of the proposal distribution 
+            and must be tuned to obtain an efficient and converging algorithm
+
         """
-        pass
+        return 2.38 / np.sqrt(self.n_p)
 
 
 class LinearElasticityLinearHardening(MaterialModel):

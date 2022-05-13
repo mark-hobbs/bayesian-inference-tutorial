@@ -15,13 +15,13 @@ class MetropolisHastings(Sampler):
     Attributes
     ----------
     model : MaterialModel
-        Material model class (linear elastic
-                              linear elastic-perfectly plastic
-                              linear elastic-linear hardening
+        Material model class (linear elastic,
+                              linear elastic-perfectly plastic,
+                              linear elastic-linear hardening,
                               linear elastic-nonlinear hardening)
 
     data : ndarray
-        Experimental stress-strain data
+        Experimental stress-strain data (observations)
 
     Methods
     -------
@@ -35,12 +35,38 @@ class MetropolisHastings(Sampler):
         self.data = data
 
     def sample(self):
-        x_p = self.draw_proposal()
+        """
+        Draw a new sample
+
+        Parameters
+        ----------
+        x_p : ndarray
+            New sample (x_p) is proposed by drawing from a proposal
+            distribution
+
+        x_i : ndarray
+            Current sample
+
+        Returns
+        -------
+
+        """
+        x_p = self.draw_proposal(model)
         pi_x_i = self.calculate_posterior(x_i)
         pi_x_p = self.calculate_posterior(x_p)
         self.accept_or_reject()
 
     def accept_or_reject(self):
+        """
+        Accept of reject a new candidate
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        """
         alpha = self.calculate_acceptance_ratio()
         u = self.generate_uniform_random_number()
         # Accept if u < alpha
@@ -68,5 +94,9 @@ class MetropolisHastings(Sampler):
         return model.posterior(self.data)
 
     def draw_proposal(self, model):
-        return model.proposal_distribution()
+        """
+        Draw x (candidate) from proposal distribution
+        """
+        return x_i * (model.proposal_distribution()
+                      * np.transpose(np.random.normal(size=(1, model.n_p))))
 
