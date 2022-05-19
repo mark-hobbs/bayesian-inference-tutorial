@@ -42,8 +42,11 @@ class LinearElasticityPerfectPlasticity():
         experimental observations)
 
     s_noise : float
-        Noise in the stress measurement (determined via calibration of the
+        Noise in the stress observations (determined via calibration of the
         testing machine).
+
+    n_p : int
+        Number of unknown parameters
 
     Methods
     -------
@@ -53,11 +56,11 @@ class LinearElasticityPerfectPlasticity():
     """
 
     def __init__(self, E, stress_y):
+        self.n_p = 2
         self.E = E
         self.stress_y = stress_y
         # self.s_noise = s_noise  # Should the noise in the stress measurement
                                   # be an attribute of the material model?
-        self.n_p = 2
 
     def calculate_stress(self, E, stress_y, strain):
 

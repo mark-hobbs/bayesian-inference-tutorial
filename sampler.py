@@ -23,6 +23,14 @@ class MetropolisHastings(Sampler):
     data : ndarray
         Experimental stress-strain data (observations)
 
+    n_samples : int
+        Number of samples (default = 10,000)
+
+    burn : int
+        Burn-in (default = 3,000). Discard the first 3,000 samples. Burn-in is
+        intended to give the Markov Chain time to reach its equilibrium
+        distribution.
+
     Methods
     -------
     
@@ -30,11 +38,17 @@ class MetropolisHastings(Sampler):
     -----
     """
 
-    def __init__(self, model, data):
+    def __init__(self, model, data, n_samples=1E4, burn=3E3):
         self.model = model
         self.data = data
+        self.n_samples = n_samples
+        self.burn = burn
 
     def sample(self):
+        for i in range(1, self.n_samples):
+            self.sample_step()
+
+    def sample_step(self):
         """
         Draw a new sample
 
@@ -49,9 +63,11 @@ class MetropolisHastings(Sampler):
 
         Returns
         -------
+        x_i : ndarray
+            Current sample
 
         """
-        x_p = self.draw_proposal(model)
+        x_p = self.draw_proposal(x_i, self.model)
         pi_x_i = self.calculate_posterior(x_i)
         pi_x_p = self.calculate_posterior(x_p)
         self.accept_or_reject()
@@ -78,7 +94,7 @@ class MetropolisHastings(Sampler):
     def generate_uniform_random_number():
         return np.random.uniform(low=0.0, high=1.0)
 
-    def calculate_posterior(self, model):
+    def calculate_posterior(self):
         """
         Calculate the posterior
 
@@ -91,12 +107,27 @@ class MetropolisHastings(Sampler):
         -------
 
         """
-        return model.posterior(self.data)
+        return self.model.posterior(self.data)
 
-    def draw_proposal(self, model):
+    def draw_proposal(self, x_i):
         """
         Draw x (candidate) from proposal distribution
+
+        Parameters
+        ----------
+        x_i : ndarray
+            Current sample
+        
+        model : MaterialModel class
+            Material model class
+
+        Returns
+        -------
+        x_p : ndarray
+            Proposed sample (candidate sample)
+
         """
-        return x_i * (model.proposal_distribution()
-                      * np.transpose(np.random.normal(size=(1, model.n_p))))
+        return x_i * (self.model.proposal_distribution()
+                      * np.transpose(
+                          np.random.normal(size=(1, self.model.n_p))))
 
