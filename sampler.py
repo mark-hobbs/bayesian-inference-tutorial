@@ -41,25 +41,38 @@ class MetropolisHastings(Sampler):
     def __init__(self, model, data, n_samples=1E4, burn=3E3):
         self.model = model
         self.data = data
-        self.n_samples = n_samples
-        self.burn = burn
+        self.n_samples = int(n_samples)
+        self.burn = int(burn)
 
-    def sample(self):
+    def sample(self, x_0):
+        """
+        Sampling loop
+
+        Parameters
+        ----------
+        x_0 : ndarray
+            Initial sample
+
+        Returns
+        -------
+
+        """
+        x_i = x_0.copy()
         for i in range(1, self.n_samples):
-            self.sample_step()
+            x_i = self.sample_step(x_i)
 
-    def sample_step(self):
+    def sample_step(self, x_i):
         """
         Draw a new sample
 
         Parameters
         ----------
+        x_i : ndarray
+            Current sample
+
         x_p : ndarray
             New sample (x_p) is proposed by drawing from a proposal
             distribution
-
-        x_i : ndarray
-            Current sample
 
         Returns
         -------
@@ -67,7 +80,7 @@ class MetropolisHastings(Sampler):
             Current sample
 
         """
-        x_p = self.draw_proposal(x_i, self.model)
+        x_p = self.draw_proposal(x_i)
         pi_x_i = self.calculate_posterior(x_i)
         pi_x_p = self.calculate_posterior(x_p)
         self.accept_or_reject()
@@ -100,6 +113,9 @@ class MetropolisHastings(Sampler):
 
         Parameters
         ----------
+        x_i : ndarray
+            Current sample
+
         model : MaterialModel class
             Material model class
 
@@ -130,4 +146,3 @@ class MetropolisHastings(Sampler):
         return x_i * (self.model.proposal_distribution()
                       * np.transpose(
                           np.random.normal(size=(1, self.model.n_p))))
-
