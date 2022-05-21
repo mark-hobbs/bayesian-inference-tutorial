@@ -33,6 +33,9 @@ class LinearElasticityPerfectPlasticity():
 
     Attributes
     ----------
+    n_p : int
+        Number of unknown parameters
+
     E : float
         Young's modulus (exact value that we wish to infer from the noisy
         experimental observations)
@@ -43,10 +46,8 @@ class LinearElasticityPerfectPlasticity():
 
     s_noise : float
         Noise in the stress observations (determined via calibration of the
-        testing machine).
-
-    n_p : int
-        Number of unknown parameters
+        testing machine). Normal distribution with a zero mean and a standard
+        deviation of s_noise.
 
     Methods
     -------
@@ -55,12 +56,14 @@ class LinearElasticityPerfectPlasticity():
     -----
     """
 
-    def __init__(self, E, stress_y):
+    def __init__(self, E, stress_y, s_noise):
         self.n_p = 2
         self.E = E
         self.stress_y = stress_y
-        # self.s_noise = s_noise  # Should the noise in the stress measurement
-                                  # be an attribute of the material model?
+
+        self.s_noise = s_noise
+        self.x_prior = None
+        self.cov_matrix_prior = None
 
     def calculate_stress(self, E, stress_y, strain):
 
@@ -85,7 +88,7 @@ class LinearElasticityPerfectPlasticity():
         plt.xlabel("Strain $\epsilon$")
         plt.ylabel("Stress $\sigma$")
 
-    def generate_synthetic_data(self, strain, s_noise, n_data_points):
+    def generate_synthetic_data(self, strain, n_data_points):
         """
         The noise in the stress measurements is a normal distribution with a
         zero mean and a standard deviation of s_noise
@@ -95,12 +98,20 @@ class LinearElasticityPerfectPlasticity():
 
         for i in range(len(stress_data)):
             stress_data[i] = (self.calculate_stress(self.E, self.stress_y,
-                              strain_data[i]) + (s_noise * np.random.normal()))
+                              strain_data[i])
+                              + (self.s_noise * np.random.normal()))
 
         return strain_data, stress_data
 
-    def likelihood(self, s_noise, strain, stress,
-                   candidate_E, candidate_stress_y):
+    def set_priors(self, x_prior, cov_matrix_prior):
+        """
+        It is considered bad practice to set attributes outside of the
+        __init__ method
+        """
+        self.x_prior = x_prior
+        self.cov_matrix_prior = cov_matrix_prior
+
+    def likelihood(self, strain, stress, E_candidate, stress_y_candidate):
         """
         Likelihood function for a single stress measurement
 
@@ -115,10 +126,10 @@ class LinearElasticityPerfectPlasticity():
         stress : float
             Experimentally measured stress
 
-        candidate_E : float
+        E_candidate : float
             Young's modulus candidate
 
-        candidate_stress_y : float
+        stress_y_candidate : float
             Yield stress candidate
 
         Returns
@@ -127,37 +138,37 @@ class LinearElasticityPerfectPlasticity():
             Likelihood for a single stress measurement
 
         """
-        return ((1 / (s_noise * np.sqrt(2 * np.pi))) * np.exp(-((stress
-                - self.calculate_stress(candidate_E, candidate_stress_y,
-                                        strain)) ** 2) / (2 * s_noise ** 2)))
+        return ((1 / (self.s_noise * np.sqrt(2 * np.pi))) * np.exp(-((stress
+                - self.calculate_stress(E_candidate, stress_y_candidate,
+                                        strain)) ** 2) 
+                                        / (2 * self.s_noise ** 2)))
 
-    def prior(self, cov_matrix, candidate_x, prior_x):
+    def prior(self, x_i):
         """
         Prior distribution
         
         Parameters
         ----------
-        cov_matrix : ndarray
-            Covariance matrix
-
-        candidate_x : ndarray
+        x_i : ndarray
             Candidate vector [E, stress_y]
 
         prior_x : ndarray
             Prior vector [E, stress_y]
             TODO: is this variable a prior? or just an initial guess?
 
+        cov_matrix : ndarray
+            Covariance matrix
+
         Returns
         -------
         
         """
-        inv_cov_matrix = np.linalg.inv(cov_matrix)
-        numerator = np.matmul(np.transpose(candidate_x - prior_x),
-                              np.matmul(inv_cov_matrix, candidate_x - prior_x))
+        inv_cov_matrix = np.linalg.inv(self.cov_matrix_prior)
+        numerator = np.matmul(np.transpose(x_i - self.x_prior),
+                              np.matmul(inv_cov_matrix, x_i - self.x_prior))
         return np.exp(-numerator / 2)
 
-    def posterior(self, strain_data, stress_data, s_noise,
-                  cov_matrix, candidate_x, prior_x):
+    def posterior(self, strain_data, stress_data, x_i):
         """
         Calculate the posterior
 
@@ -169,15 +180,8 @@ class LinearElasticityPerfectPlasticity():
         stress_data : ndarray
             Experimental measured stress data
 
-        cov_matrix : ndarray
-            TODO: attribute of the sampler?
-
-        candidate : ndarray
-            TODO: attribute of the sampler?
-
-        s_noise : float
-            Noise in the stress measurement (normal distribution with a zero
-            mean and a standard deviation of s_noise)
+        x_i : ndarray
+            Candidate vector [E, stress_y]
 
         Returns
         -------
@@ -185,10 +189,9 @@ class LinearElasticityPerfectPlasticity():
         """
         total = 0
         for i in range(len(stress_data)):
-            total += self.likelihood(s_noise,
-                                     strain_data[i-1], stress_data[i-1],
-                                     candidate_x[0], candidate_x[1])
-        return self.prior(cov_matrix, candidate_x, prior_x) * total
+            total += self.likelihood(strain_data[i-1], stress_data[i-1],
+                                     x_i[0], x_i[1])
+        return self.prior(x_i) * total
 
     def proposal_distribution(self):
         """

@@ -1,5 +1,6 @@
 
 import numpy as np
+from tqdm import tqdm
 
 
 class Sampler():
@@ -58,8 +59,11 @@ class MetropolisHastings(Sampler):
 
         """
         x_i = x_0.copy()
-        for i in range(1, self.n_samples):
+        x_hist = np.zeros([self.n_samples, self.model.n_p])
+        for i in tqdm(range(self.n_samples)):
             x_i = self.sample_step(x_i)
+            x_hist[i, :] = np.transpose(x_i)
+        return x_hist
 
     def sample_step(self, x_i):
         """
@@ -83,9 +87,9 @@ class MetropolisHastings(Sampler):
         x_p = self.draw_proposal(x_i)
         pi_x_i = self.calculate_posterior(x_i)
         pi_x_p = self.calculate_posterior(x_p)
-        self.accept_or_reject()
+        return self.accept_or_reject(x_i, x_p, pi_x_i, pi_x_p)
 
-    def accept_or_reject(self):
+    def accept_or_reject(self, x_i, x_p, pi_x_i, pi_x_p):
         """
         Accept of reject a new candidate
 
@@ -96,18 +100,21 @@ class MetropolisHastings(Sampler):
         -------
 
         """
-        alpha = self.calculate_acceptance_ratio()
+        alpha = self.calculate_acceptance_ratio(pi_x_p, pi_x_i)
         u = self.generate_uniform_random_number()
-        # Accept if u < alpha
-        # Reject if u > alpha
+        if u < alpha: # Accept
+            return x_p
+        if u > alpha: # Reject
+            return x_i
 
-    def calculate_acceptance_ratio(self):
-        return min(1, pi_x_p, pi_x_i)
+    def calculate_acceptance_ratio(self, pi_x_p, pi_x_i):
+        return min(1, pi_x_p / pi_x_i)
 
+    @staticmethod
     def generate_uniform_random_number():
         return np.random.uniform(low=0.0, high=1.0)
 
-    def calculate_posterior(self):
+    def calculate_posterior(self, x_i):
         """
         Calculate the posterior
 
@@ -123,7 +130,7 @@ class MetropolisHastings(Sampler):
         -------
 
         """
-        return self.model.posterior(self.data)
+        return self.model.posterior(self.data[0], self.data[1], x_i)
 
     def draw_proposal(self, x_i):
         """
@@ -143,6 +150,6 @@ class MetropolisHastings(Sampler):
             Proposed sample (candidate sample)
 
         """
-        return x_i * (self.model.proposal_distribution()
+        return x_i + (self.model.proposal_distribution()
                       * np.transpose(
                           np.random.normal(size=(1, self.model.n_p))))
