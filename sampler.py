@@ -56,14 +56,23 @@ class MetropolisHastings(Sampler):
 
         Returns
         -------
+        x_hist: ndarray
+            Parameter chain
+
+        pdf_hist : ndarray
+            Probability density of every sample
 
         """
         x_i = x_0.copy()
         x_hist = np.zeros([self.n_samples, self.model.n_p])
+        pdf_hist = np.zeros(self.n_samples)
+
         for i in tqdm(range(self.n_samples)):
-            x_i = self.sample_step(x_i)
+            x_i, pdf = self.sample_step(x_i)
             x_hist[i, :] = np.transpose(x_i)
-        return x_hist
+            pdf_hist[i] = pdf
+
+        return x_hist, pdf_hist
 
     def sample_step(self, x_i):
         """
@@ -73,10 +82,6 @@ class MetropolisHastings(Sampler):
         ----------
         x_i : ndarray
             Current sample
-
-        x_p : ndarray
-            New sample (x_p) is proposed by drawing from a proposal
-            distribution
 
         Returns
         -------
@@ -95,6 +100,12 @@ class MetropolisHastings(Sampler):
 
         Parameters
         ----------
+        x_i : ndarray
+            Current sample
+
+        x_p : ndarray
+            New sample (x_p) is proposed by drawing from a proposal
+            distribution
 
         Returns
         -------
@@ -102,10 +113,10 @@ class MetropolisHastings(Sampler):
         """
         alpha = self.calculate_acceptance_ratio(pi_x_p, pi_x_i)
         u = self.generate_uniform_random_number()
-        if u < alpha: # Accept
-            return x_p
-        if u > alpha: # Reject
-            return x_i
+        if u <= alpha:  # Accept proposal
+            return x_p, pi_x_p
+        if u > alpha:  # Reject proposal
+            return x_i, pi_x_i
 
     def calculate_acceptance_ratio(self, pi_x_p, pi_x_i):
         return min(1, pi_x_p / pi_x_i)

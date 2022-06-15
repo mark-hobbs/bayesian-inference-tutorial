@@ -111,20 +111,54 @@ class LinearElasticityPerfectPlasticity():
         self.x_prior = x_prior
         self.cov_matrix_prior = cov_matrix_prior
 
-    def likelihood(self, strain, stress, E_candidate, stress_y_candidate):
+    # def likelihood(self, strain, stress, E_candidate, stress_y_candidate):
+    #     """
+    #     Likelihood function for a single stress measurement
+
+    #     Parameters
+    #     ----------
+    #     s_noise : float
+    #         Noise in the stress measurement (determined experimentally)
+
+    #     strain : float
+    #         Experimentally measured strain
+
+    #     stress : float
+    #         Experimentally measured stress
+
+    #     E_candidate : float
+    #         Young's modulus candidate
+
+    #     stress_y_candidate : float
+    #         Yield stress candidate
+
+    #     Returns
+    #     -------
+    #     likelihood : float
+    #         Likelihood for a single stress measurement
+
+    #     """
+    #     alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
+    #     beta = stress - self.calculate_stress(E_candidate,
+    #                                           stress_y_candidate,
+    #                                           strain)
+    #     return alpha * np.exp( - (beta ** 2) / (2 * self.s_noise ** 2))
+
+    def likelihood(self, strain_data, stress_data,
+                   E_candidate, stress_y_candidate):
         """
-        Likelihood function for a single stress measurement
+        Likelihood function for full data set
 
         Parameters
         ----------
         s_noise : float
             Noise in the stress measurement (determined experimentally)
 
-        strain : float
-            Experimentally measured strain
+        strain_data : ndarray
+            Experimentally measured strain data
 
-        stress : float
-            Experimentally measured stress
+        stress_data : ndarray
+            Experimental measured stress data
 
         E_candidate : float
             Young's modulus candidate
@@ -135,13 +169,17 @@ class LinearElasticityPerfectPlasticity():
         Returns
         -------
         likelihood : float
-            Likelihood for a single stress measurement
+            Likelihood
 
         """
-        return ((1 / (self.s_noise * np.sqrt(2 * np.pi))) * np.exp(-((stress
-                - self.calculate_stress(E_candidate, stress_y_candidate,
-                                        strain)) ** 2) 
-                                        / (2 * self.s_noise ** 2)))
+        alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
+        beta = 0
+        for i in range(len(stress_data)):
+            beta += (stress_data[i]
+                     - self.calculate_stress(E_candidate,
+                                             stress_y_candidate,
+                                             strain_data[i])) ** 2
+        return alpha * np.exp(- beta / (2 * self.s_noise ** 2))
 
     def prior(self, x_i):
         """
@@ -152,7 +190,7 @@ class LinearElasticityPerfectPlasticity():
         x_i : ndarray
             Candidate vector [E, stress_y]
 
-        prior_x : ndarray
+        x_prior : ndarray
             Prior vector [E, stress_y]
             TODO: is this variable a prior? or just an initial guess?
 
@@ -176,7 +214,7 @@ class LinearElasticityPerfectPlasticity():
         ----------
         strain_data : ndarray
             Experimentally measured strain data
-        
+
         stress_data : ndarray
             Experimental measured stress data
 
@@ -187,11 +225,8 @@ class LinearElasticityPerfectPlasticity():
         -------
 
         """
-        total = 0
-        for i in range(len(stress_data)):
-            total += self.likelihood(strain_data[i-1], stress_data[i-1],
-                                     x_i[0], x_i[1])
-        return self.prior(x_i) * total
+        return self.prior(x_i) * self.likelihood(strain_data, stress_data,
+                                                 x_i[0], x_i[1])
 
     def proposal_distribution(self):
         """
@@ -205,11 +240,11 @@ class LinearElasticityPerfectPlasticity():
         Returns
         -------
         gamma : float
-            Parameter that determines the width of the proposal distribution 
+            Parameter that determines the width of the proposal distribution
             and must be tuned to obtain an efficient and converging algorithm
 
         """
-        return 2.38 / np.sqrt(self.n_p)
+        return [[5], [0.1]] / np.sqrt(self.n_p)
 
 
 class LinearElasticityLinearHardening(MaterialModel):
