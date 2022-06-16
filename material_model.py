@@ -111,38 +111,39 @@ class LinearElasticityPerfectPlasticity():
         self.x_prior = x_prior
         self.cov_matrix_prior = cov_matrix_prior
 
-    # def likelihood(self, strain, stress, E_candidate, stress_y_candidate):
-    #     """
-    #     Likelihood function for a single stress measurement
+    def likelihood_single_measurement(self, strain, stress,
+                                      E_candidate, stress_y_candidate):
+        """
+        Likelihood function for a single stress measurement
 
-    #     Parameters
-    #     ----------
-    #     s_noise : float
-    #         Noise in the stress measurement (determined experimentally)
+        Parameters
+        ----------
+        s_noise : float
+            Noise in the stress measurement (determined experimentally)
 
-    #     strain : float
-    #         Experimentally measured strain
+        strain : float
+            Experimentally measured strain
 
-    #     stress : float
-    #         Experimentally measured stress
+        stress : float
+            Experimentally measured stress
 
-    #     E_candidate : float
-    #         Young's modulus candidate
+        E_candidate : float
+            Young's modulus candidate
 
-    #     stress_y_candidate : float
-    #         Yield stress candidate
+        stress_y_candidate : float
+            Yield stress candidate
 
-    #     Returns
-    #     -------
-    #     likelihood : float
-    #         Likelihood for a single stress measurement
+        Returns
+        -------
+        likelihood : float
+            Likelihood for a single stress measurement
 
-    #     """
-    #     alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
-    #     beta = stress - self.calculate_stress(E_candidate,
-    #                                           stress_y_candidate,
-    #                                           strain)
-    #     return alpha * np.exp( - (beta ** 2) / (2 * self.s_noise ** 2))
+        """
+        alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
+        beta = stress - self.calculate_stress(E_candidate,
+                                              stress_y_candidate,
+                                              strain)
+        return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
 
     def likelihood(self, strain_data, stress_data,
                    E_candidate, stress_y_candidate):
@@ -227,6 +228,33 @@ class LinearElasticityPerfectPlasticity():
         """
         return self.prior(x_i) * self.likelihood(strain_data, stress_data,
                                                  x_i[0], x_i[1])
+
+    # def posterior(self, strain_data, stress_data, x_i):
+    #     """
+    #     Calculate the posterior
+
+    #     Parameters
+    #     ----------
+    #     strain_data : ndarray
+    #         Experimentally measured strain data
+
+    #     stress_data : ndarray
+    #         Experimental measured stress data
+
+    #     x_i : ndarray
+    #         Candidate vector [E, stress_y]
+
+    #     Returns
+    #     -------
+
+    #     """
+    #     alpha = 0
+    #     for i in range(len(stress_data)):
+    #         alpha += self.likelihood_single_measurement(strain_data[i],
+    #                                                     stress_data[i],
+    #                                                     x_i[0], x_i[1])
+
+    #     return self.prior(x_i) * alpha
 
     def proposal_distribution(self):
         """

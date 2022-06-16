@@ -164,3 +164,29 @@ class MetropolisHastings(Sampler):
         return x_i + (self.model.proposal_distribution()
                       * np.transpose(
                           np.random.normal(size=(1, self.model.n_p))))
+
+    def calculate_mean(self, x_hist):
+        """
+        Calculate the mean of the posterior distribution
+
+        Parameters
+        ----------
+        x_hist : ndarray
+
+        Returns
+        -------
+        x_mean : ndarray
+
+        TODO: move to Sampler class
+
+        """
+        x_hist_burned = x_hist[self.burn:]
+        return np.mean(x_hist_burned, 0)
+
+    def calculate_correlation(self):
+        pass
+
+    def calculate_95_percent_credible_region(self):
+        pass
+
+
