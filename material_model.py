@@ -111,8 +111,7 @@ class LinearElasticityPerfectPlasticity():
         self.x_prior = x_prior
         self.cov_matrix_prior = cov_matrix_prior
 
-    def likelihood_single_measurement(self, strain, stress,
-                                      E_candidate, stress_y_candidate):
+    def likelihood(self, strain, stress, E_candidate, stress_y_candidate):
         """
         Likelihood function for a single stress measurement
 
@@ -145,8 +144,8 @@ class LinearElasticityPerfectPlasticity():
                                               strain)
         return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
 
-    def likelihood(self, strain_data, stress_data,
-                   E_candidate, stress_y_candidate):
+    def likelihood_(self, strain_data, stress_data,
+                    E_candidate, stress_y_candidate):
         """
         Likelihood function for full data set
 
@@ -226,35 +225,33 @@ class LinearElasticityPerfectPlasticity():
         -------
 
         """
+        alpha = []
+        for i in range(len(stress_data)):
+            alpha.append(self.likelihood(strain_data[i], stress_data[i],
+                                         x_i[0], x_i[1]))
+        return self.prior(x_i) * np.prod(alpha)
+
+    def posterior_(self, strain_data, stress_data, x_i):
+        """
+        Calculate the posterior
+
+        Parameters
+        ----------
+        strain_data : ndarray
+            Experimentally measured strain data
+
+        stress_data : ndarray
+            Experimental measured stress data
+
+        x_i : ndarray
+            Candidate vector [E, stress_y]
+
+        Returns
+        -------
+
+        """
         return self.prior(x_i) * self.likelihood(strain_data, stress_data,
                                                  x_i[0], x_i[1])
-
-    # def posterior(self, strain_data, stress_data, x_i):
-    #     """
-    #     Calculate the posterior
-
-    #     Parameters
-    #     ----------
-    #     strain_data : ndarray
-    #         Experimentally measured strain data
-
-    #     stress_data : ndarray
-    #         Experimental measured stress data
-
-    #     x_i : ndarray
-    #         Candidate vector [E, stress_y]
-
-    #     Returns
-    #     -------
-
-    #     """
-    #     alpha = 0
-    #     for i in range(len(stress_data)):
-    #         alpha += self.likelihood_single_measurement(strain_data[i],
-    #                                                     stress_data[i],
-    #                                                     x_i[0], x_i[1])
-
-    #     return self.prior(x_i) * alpha
 
     def proposal_distribution(self):
         """
