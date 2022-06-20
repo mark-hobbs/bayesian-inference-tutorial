@@ -22,10 +22,10 @@ The aim of this contribution is to explain in a straightforward manner how Bayes
 
 There are four examples:
 
-* Linear Elasticity
-* Linear Elasticity-Perfect Plasticity
-* Linear Elasticity-Linear Hardening
-* Linear Elasticity-Nonlinear Hardening
+1) Linear Elasticity
+2) Linear Elasticity-Perfect Plasticity
+3) Linear Elasticity-Linear Hardening
+4) Linear Elasticity-Nonlinear Hardening
 
 ---
 
