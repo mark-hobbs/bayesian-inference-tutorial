@@ -145,7 +145,7 @@ class MetropolisHastings(Sampler):
 
     def draw_proposal(self, x_i):
         """
-        Draw x (candidate) from proposal distribution
+        Draw x (candidate) from proposal distribution q
 
         Parameters
         ----------
@@ -161,9 +161,28 @@ class MetropolisHastings(Sampler):
             Proposed sample (candidate sample)
 
         """
-        return x_i + (self.model.proposal_distribution()
+        return x_i + (self.model.compute_gamma()
                       * np.transpose(
                           np.random.normal(size=(1, self.model.n_p))))
+
+    def draw_proposal_adaptive(self):
+        """
+        Draw x (candidate) from adaptive proposal distribution
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        Notes
+        -----
+        Eq. (58) in Rappel et al., (2018)
+
+        TODO: move to AdaptiveMetropolisHastings class
+
+        """
+        pass
 
     def calculate_mean(self, x_hist):
         """
@@ -177,7 +196,7 @@ class MetropolisHastings(Sampler):
         -------
         x_mean : ndarray
 
-        TODO: move to Sampler class
+        TODO: move to Sampler or Utilities class
 
         """
         x_hist_burned = x_hist[self.burn:]

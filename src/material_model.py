@@ -51,7 +51,7 @@ class LinearElasticityPerfectPlasticity():
 
     Methods
     -------
-    
+
     Notes
     -----
     """
@@ -184,7 +184,7 @@ class LinearElasticityPerfectPlasticity():
     def prior(self, x_i):
         """
         Prior distribution
-        
+
         Parameters
         ----------
         x_i : ndarray
@@ -199,7 +199,7 @@ class LinearElasticityPerfectPlasticity():
 
         Returns
         -------
-        
+
         """
         inv_cov_matrix = np.linalg.inv(self.cov_matrix_prior)
         numerator = np.matmul(np.transpose(x_i - self.x_prior),
@@ -253,9 +253,11 @@ class LinearElasticityPerfectPlasticity():
         return self.prior(x_i) * self.likelihood(strain_data, stress_data,
                                                  x_i[0], x_i[1])
 
-    def proposal_distribution(self):
+    def compute_gamma(self):
         """
-        Proposal distribution (q)
+        Compute gamma, a parameter that determines the width of the proposal
+        distribution and must be tuned to obtain an efficient and converging
+        algorithm
 
         Parameters
         ----------
@@ -268,8 +270,30 @@ class LinearElasticityPerfectPlasticity():
             Parameter that determines the width of the proposal distribution
             and must be tuned to obtain an efficient and converging algorithm
 
+        TODO: rename compute_gamma()?
+        TODO: should this move to the Sampler class?
+
         """
         return [[5], [0.1]] / np.sqrt(self.n_p)
+
+    # def proposal_distribution(self):
+    #     """
+    #     Proposal distribution (q)
+
+    #     Parameters
+    #     ----------
+
+    #     Returns
+    #     -------
+
+    #     Notes
+    #     -----
+    #     See Eq. (53) in Hussein et al., (2020)
+
+    #     """
+    #     a = -1 / (2 * self.gamma**2)
+    #     b = np.linalg.norm(x_i - x_p)
+    #     return np.exp(a * b**2)
 
 
 class LinearElasticityLinearHardening(MaterialModel):
