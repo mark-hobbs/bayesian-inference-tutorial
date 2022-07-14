@@ -250,8 +250,8 @@ class LinearElasticityPerfectPlasticity():
         -------
 
         """
-        return self.prior(x_i) * self.likelihood(strain_data, stress_data,
-                                                 x_i[0], x_i[1])
+        return self.prior(x_i) * self.likelihood_(strain_data, stress_data,
+                                                  x_i[0], x_i[1])
 
     def compute_gamma(self):
         """

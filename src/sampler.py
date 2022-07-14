@@ -202,7 +202,7 @@ class MetropolisHastings(Sampler):
         x_hist_burned = x_hist[self.burn:]
         return np.mean(x_hist_burned, 0)
 
-    def calculate_covariance(self):
+    def calculate_covariance(self, x_hist):
         """
         Calculate the covariance (correlation) between the model parameters
         
@@ -215,7 +215,10 @@ class MetropolisHastings(Sampler):
         x_cov : ndarray
 
         """
-        pass
+        x_hist_burned = x_hist[self.burn:]
+        return np.cov(np.transpose(x_hist_burned))
+
+
 
     def calculate_95_percent_credible_region(self):
         pass
