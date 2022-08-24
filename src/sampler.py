@@ -32,9 +32,13 @@ class MetropolisHastings(Sampler):
         intended to give the Markov Chain time to reach its equilibrium
         distribution.
 
+    n_chains : int
+        Number of chains (default = 1). This value should be equal to or less
+        than the number of available threads.
+
     Methods
     -------
-    
+
     Notes
     -----
     """
@@ -151,7 +155,7 @@ class MetropolisHastings(Sampler):
         ----------
         x_i : ndarray
             Current sample
-        
+
         model : MaterialModel class
             Material model class
 
@@ -171,6 +175,9 @@ class MetropolisHastings(Sampler):
 
         Parameters
         ----------
+        K : ndarray
+            All previous samples are stored in matrix K of size n_k x n_p,
+            where n_k is... and n_p is the number of unknown parameters.
 
         Returns
         -------
@@ -205,7 +212,7 @@ class MetropolisHastings(Sampler):
     def calculate_covariance(self, x_hist):
         """
         Calculate the covariance (correlation) between the model parameters
-        
+
         Parameters
         ----------
         x_hist : ndarray
@@ -218,9 +225,5 @@ class MetropolisHastings(Sampler):
         x_hist_burned = x_hist[self.burn:]
         return np.cov(np.transpose(x_hist_burned))
 
-
-
     def calculate_95_percent_credible_region(self):
         pass
-
-
