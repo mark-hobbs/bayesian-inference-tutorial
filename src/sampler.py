@@ -277,19 +277,44 @@ class AdaptiveMetropolisHastings(Sampler):
         x_i = x_0.copy()
         x_hist = np.zeros([self.n_samples, self.model.n_p])
         pdf_hist = np.zeros(self.n_samples)
+        K = np.zeros([self.n_samples / self.update_freq, self.model.n_p])
+        counter = 0
 
         for i in tqdm(range(self.n_samples)):
-            x_i, pdf = self.sample_step(x_i)
+
+            if i % self.update_freq == 0:
+                K[counter, :] = np.transpose(x_i)
+                K_tilde = self.calculate_K_tilde(K)
+                counter += 1
+
+            x_i, pdf = self.sample_step(x_i, K_tilde)
             x_hist[i, :] = np.transpose(x_i)
             pdf_hist[i] = pdf
 
-            if i % self.update_freq == 0:
-                # update proposal distribution
-                pass
-
         return x_hist, pdf_hist
 
-    def draw_proposal(self, x_i):
+    def sample_step(self, x_i):
+        """
+        Draw a new sample using the Metropolis-Hastings algorithm with the
+        adaptive proposal technique
+
+        Parameters
+        ----------
+        x_i : ndarray
+            Current sample
+
+        Returns
+        -------
+        x_i : ndarray
+            Current sample
+
+        """
+        x_p = self.draw_proposal(x_i, K_tilde)
+        pi_x_i = self.calculate_posterior(x_i)
+        pi_x_p = self.calculate_posterior(x_p)
+        return self.accept_or_reject(x_i, x_p, pi_x_i, pi_x_p)
+
+    def draw_proposal(self, x_i, K_tilde):
         """
         Draw x (candidate) from adaptive proposal distribution q
 
@@ -301,9 +326,11 @@ class AdaptiveMetropolisHastings(Sampler):
         model : MaterialModel class
             Material model class
 
-        K : ndarray
-            All previous samples are stored in matrix K of size n_k x n_p,
-            where n_k is... and n_p is the number of unknown parameters.
+        n_k : ndarray
+            Write description...
+
+        K_tilde : ndarray
+            Write description...
 
         Returns
         -------
@@ -315,31 +342,27 @@ class AdaptiveMetropolisHastings(Sampler):
         Eq. (58) in Rappel et al., (2018)
 
         """
-        return x_i + (self.model.compute_gamma()
-                      * np.transpose(
-                          np.random.normal(size=(1, self.model.n_p))))
+        return x_i + ((self.model.compute_gamma() / np.sqrt(n_k - 1))
+                      * K_tilde * np.random.normal(size=(1, n_k)))
 
-    def calculate_K_mean(self):
+    def calculate_K_tilde(self, K):
         """
-        Calculate...
-        
+        Calculate the centred matrix
+
         Parameters
         ----------
         K : ndarray
             Sample chain - all previous samples are stored in matrix K of size
             n_k x n_p, where n_k is... and n_p is the number of unknown
-            parameters.
+            parameters. Each row represents one sampled point.
 
-        k_mean : ndarray
-            Mean value of all previous samples (1 x n_p)
-
-        Returns
-        -------
         K_mean : ndarray
             History (evolution) of mean value of all previous samples
             (n_samples x n_p)
-        """
-        pass
 
-    def calculate_K_tilde(self):
-        return K - self.calculate_K_mean()
+        Returns
+        -------
+        K_tilde : ndarray
+            The centred matrix (K_tilde = K - E[K])
+        """
+        return K - np.mean(K, 0)
