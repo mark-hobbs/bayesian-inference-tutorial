@@ -242,6 +242,9 @@ class AdaptiveMetropolisHastings(Sampler):
         Proposal distribution update frequency (default = 1000). The
         frequency at which the proposal distribution is updated.
 
+    n_K : ndarray
+        Number of samples / update frequency
+
     Methods
     -------
 
@@ -255,6 +258,7 @@ class AdaptiveMetropolisHastings(Sampler):
         self.n_samples = int(n_samples)
         self.burn = int(burn)
         self.update_freq = int(update_freq)
+        self.n_K = self.n_samples / self.update_freq
 
     def sample(self, x_0):
         """
@@ -326,9 +330,6 @@ class AdaptiveMetropolisHastings(Sampler):
         model : MaterialModel class
             Material model class
 
-        n_k : ndarray
-            Write description...
-
         K_tilde : ndarray
             Write description...
 
@@ -342,8 +343,8 @@ class AdaptiveMetropolisHastings(Sampler):
         Eq. (58) in Rappel et al., (2018)
 
         """
-        return x_i + ((self.model.compute_gamma() / np.sqrt(n_k - 1))
-                      * K_tilde * np.random.normal(size=(1, n_k)))
+        return x_i + ((self.model.compute_gamma() / np.sqrt(self.n_K - 1))
+                      * K_tilde * np.random.normal(size=(1, self.n_K)))
 
     def calculate_K_tilde(self, K):
         """
