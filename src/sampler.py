@@ -167,8 +167,7 @@ class MetropolisHastings(Sampler):
 
         """
         return x_i + (self.model.compute_gamma()
-                      * np.transpose(
-                          np.random.normal(size=(1, self.model.n_p))))
+                      * np.random.normal(size=(self.model.n_p, 1)))
 
     def calculate_mean(self, x_hist):
         """
@@ -258,7 +257,7 @@ class AdaptiveMetropolisHastings(Sampler):
         self.n_samples = int(n_samples)
         self.burn = int(burn)
         self.update_freq = int(update_freq)
-        self.n_K = self.n_samples / self.update_freq
+        self.n_K = int(self.n_samples / self.update_freq)
 
     def sample(self, x_0):
         """
@@ -281,7 +280,8 @@ class AdaptiveMetropolisHastings(Sampler):
         x_i = x_0.copy()
         x_hist = np.zeros([self.n_samples, self.model.n_p])
         pdf_hist = np.zeros(self.n_samples)
-        K = np.zeros([self.n_samples / self.update_freq, self.model.n_p])
+        K = np.zeros([self.n_K, self.model.n_p])
+        K_tilde = self.calculate_K_tilde(K)
         counter = 0
 
         for i in tqdm(range(self.n_samples)):
@@ -297,7 +297,7 @@ class AdaptiveMetropolisHastings(Sampler):
 
         return x_hist, pdf_hist
 
-    def sample_step(self, x_i):
+    def sample_step(self, x_i, K_tilde):
         """
         Draw a new sample using the Metropolis-Hastings algorithm with the
         adaptive proposal technique
@@ -318,6 +318,55 @@ class AdaptiveMetropolisHastings(Sampler):
         pi_x_p = self.calculate_posterior(x_p)
         return self.accept_or_reject(x_i, x_p, pi_x_i, pi_x_p)
 
+    def accept_or_reject(self, x_i, x_p, pi_x_i, pi_x_p):
+        """
+        Accept of reject a new candidate
+
+        Parameters
+        ----------
+        x_i : ndarray
+            Current sample
+
+        x_p : ndarray
+            New sample (x_p) is proposed by drawing from a proposal
+            distribution
+
+        Returns
+        -------
+
+        """
+        alpha = self.calculate_acceptance_ratio(pi_x_p, pi_x_i)
+        u = self.generate_uniform_random_number()
+        if u <= alpha:  # Accept proposal
+            return x_p, pi_x_p
+        if u > alpha:  # Reject proposal
+            return x_i, pi_x_i
+
+    def calculate_acceptance_ratio(self, pi_x_p, pi_x_i):
+        return min(1, pi_x_p / pi_x_i)
+
+    @staticmethod
+    def generate_uniform_random_number():
+        return np.random.uniform(low=0.0, high=1.0)
+
+    def calculate_posterior(self, x_i):
+        """
+        Calculate the posterior
+
+        Parameters
+        ----------
+        x_i : ndarray
+            Current sample
+
+        model : MaterialModel class
+            Material model class
+
+        Returns
+        -------
+
+        """
+        return self.model.posterior(self.data[0], self.data[1], x_i)
+
     def draw_proposal(self, x_i, K_tilde):
         """
         Draw x (candidate) from adaptive proposal distribution q
@@ -331,7 +380,7 @@ class AdaptiveMetropolisHastings(Sampler):
             Material model class
 
         K_tilde : ndarray
-            Write description...
+            Write description... n_K x n_p
 
         Returns
         -------
@@ -344,7 +393,8 @@ class AdaptiveMetropolisHastings(Sampler):
 
         """
         return x_i + ((self.model.compute_gamma() / np.sqrt(self.n_K - 1))
-                      * K_tilde * np.random.normal(size=(1, self.n_K)))
+                      * np.matmul(np.transpose(K_tilde),
+                      np.random.normal(size=(self.n_K, 1))))
 
     def calculate_K_tilde(self, K):
         """

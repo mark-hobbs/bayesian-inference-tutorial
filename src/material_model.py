@@ -274,7 +274,8 @@ class LinearElasticityPerfectPlasticity():
         TODO: should this move to the Sampler class?
 
         """
-        return [[5], [0.1]] / np.sqrt(self.n_p)
+        # return [[5], [0.1]] / np.sqrt(self.n_p)
+        return 2.38 / np.sqrt(self.n_p)
 
     # def proposal_distribution(self):
     #     """
