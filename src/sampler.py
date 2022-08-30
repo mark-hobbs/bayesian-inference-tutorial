@@ -414,6 +414,6 @@ class AdaptiveMetropolisHastings(Sampler):
         Returns
         -------
         K_tilde : ndarray
-            The centred matrix (K_tilde = K - E[K])
+            The centred matrix n_K x n_p (K_tilde = K - E[K])
         """
         return K - np.mean(K, 0)
