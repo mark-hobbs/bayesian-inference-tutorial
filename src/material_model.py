@@ -181,6 +181,39 @@ class LinearElasticityPerfectPlasticity():
                                              strain_data[i])) ** 2
         return alpha * np.exp(- beta / (2 * self.s_noise ** 2))
 
+    def log_likelihood(self, strain, stress, E_candidate, stress_y_candidate):
+        """
+        Log-likelihood function for a single stress measurement
+
+        Parameters
+        ----------
+        s_noise : float
+            Noise in the stress measurement (determined experimentally)
+
+        strain : float
+            Experimentally measured strain
+
+        stress : float
+            Experimentally measured stress
+
+        E_candidate : float
+            Young's modulus candidate
+
+        stress_y_candidate : float
+            Yield stress candidate
+
+        Returns
+        -------
+        log_likelihood : float
+            Log-likelihood for a single stress measurement
+
+        Notes
+        -----
+        TODO: check the formula is correct
+        """
+        return np.log(self.likelihood(strain, stress, E_candidate,
+                                      stress_y_candidate))
+
     def prior(self, x_i):
         """
         Prior distribution
@@ -205,6 +238,28 @@ class LinearElasticityPerfectPlasticity():
         numerator = np.matmul(np.transpose(x_i - self.x_prior),
                               np.matmul(inv_cov_matrix, x_i - self.x_prior))
         return np.exp(-numerator / 2)
+
+    def log_prior(self, x_i):
+        """
+        Log-prior distribution
+
+        Parameters
+        ----------
+        x_i : ndarray
+            Candidate vector [E, stress_y]
+
+        x_prior : ndarray
+            Prior vector [E, stress_y]
+            TODO: is this variable a prior? or just an initial guess?
+
+        cov_matrix : ndarray
+            Covariance matrix
+
+        Returns
+        -------
+
+        """
+        return np.log(self.prior(x_i))
 
     def posterior(self, strain_data, stress_data, x_i):
         """
@@ -274,8 +329,8 @@ class LinearElasticityPerfectPlasticity():
         TODO: should this move to the Sampler class?
 
         """
-        # return [[5], [0.1]] / np.sqrt(self.n_p)
-        return 2.38 / np.sqrt(self.n_p)
+        return [[5], [0.1]] / np.sqrt(self.n_p)
+        # return 2.38 / np.sqrt(self.n_p)
 
     # def proposal_distribution(self):
     #     """
