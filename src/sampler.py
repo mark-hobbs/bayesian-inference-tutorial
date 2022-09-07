@@ -44,11 +44,12 @@ class MetropolisHastings(Sampler):
     -----
     """
 
-    def __init__(self, model, data, n_samples=1E4, burn=3E3):
+    def __init__(self, model, data, n_samples=1E4, burn=3E3, step_size=2.38):
         self.model = model
         self.data = data
         self.n_samples = int(n_samples)
         self.burn = int(burn)
+        self.step_size = step_size
 
     def sample(self, x_0):
         """
@@ -166,8 +167,34 @@ class MetropolisHastings(Sampler):
             Proposed sample (candidate sample)
 
         """
-        return x_i + (self.model.compute_gamma()
+        return x_i + (self.compute_gamma()
                       * np.random.normal(size=(self.model.n_p, 1)))
+
+    def compute_gamma(self):
+        """
+        Compute gamma, a parameter that determines the width of the proposal
+        distribution and must be tuned to obtain an efficient and converging
+        algorithm
+
+        Parameters
+        ----------
+        step_size : ndarray
+
+
+        n_p : int
+            Number of unknown parameters
+
+        Returns
+        -------
+        gamma : float
+            Parameter that determines the width of the proposal distribution
+            and must be tuned to obtain an efficient and converging algorithm
+
+        TODO: rename compute_gamma()?
+        TODO: should this move to the Sampler class?
+
+        """
+        return self.step_size / np.sqrt(self.model.n_p)
 
     def calculate_mean(self, x_hist):
         """
@@ -251,13 +278,15 @@ class AdaptiveMetropolisHastings(Sampler):
     -----
     """
 
-    def __init__(self, model, data, n_samples=1E4, burn=3E3, update_freq=1E3):
+    def __init__(self, model, data, n_samples=1E4, burn=3E3, update_freq=1E3,
+                step_size=2.38):
         self.model = model
         self.data = data
         self.n_samples = int(n_samples)
         self.burn = int(burn)
         self.update_freq = int(update_freq)
         self.n_K = int(self.n_samples / self.update_freq)
+        self.step_size = step_size
 
     def sample(self, x_0):
         """
@@ -392,9 +421,35 @@ class AdaptiveMetropolisHastings(Sampler):
         Eq. (58) in Rappel et al., (2018)
 
         """
-        return x_i + ((self.model.compute_gamma() / np.sqrt(self.n_K - 1))
+        return x_i + ((self.compute_gamma() / np.sqrt(self.n_K - 1))
                       * np.matmul(np.transpose(K_tilde),
                       np.random.normal(size=(self.n_K, 1))))
+
+    def compute_gamma(self):
+        """
+        Compute gamma, a parameter that determines the width of the proposal
+        distribution and must be tuned to obtain an efficient and converging
+        algorithm
+
+        Parameters
+        ----------
+        step_size : ndarray
+
+
+        n_p : int
+            Number of unknown parameters
+
+        Returns
+        -------
+        gamma : float
+            Parameter that determines the width of the proposal distribution
+            and must be tuned to obtain an efficient and converging algorithm
+
+        TODO: rename compute_gamma()?
+        TODO: should this move to the Sampler class?
+
+        """
+        return self.step_size / np.sqrt(self.model.n_p)
 
     def calculate_K_tilde(self, K):
         """

@@ -308,29 +308,30 @@ class LinearElasticityPerfectPlasticity():
         return self.prior(x_i) * self.likelihood_(strain_data, stress_data,
                                                   x_i[0], x_i[1])
 
-    def compute_gamma(self):
+    def log_posterior(self, strain_data, stress_data, x_i):
         """
-        Compute gamma, a parameter that determines the width of the proposal
-        distribution and must be tuned to obtain an efficient and converging
-        algorithm
+        Calculate the log-posterior
 
         Parameters
         ----------
-        n_p : int
-            Number of unknown parameters
+        strain_data : ndarray
+            Experimentally measured strain data
+
+        stress_data : ndarray
+            Experimental measured stress data
+
+        x_i : ndarray
+            Candidate vector [E, stress_y]
 
         Returns
         -------
-        gamma : float
-            Parameter that determines the width of the proposal distribution
-            and must be tuned to obtain an efficient and converging algorithm
-
-        TODO: rename compute_gamma()?
-        TODO: should this move to the Sampler class?
 
         """
-        return [[5], [0.1]] / np.sqrt(self.n_p)
-        # return 2.38 / np.sqrt(self.n_p)
+        alpha = []
+        for i in range(len(stress_data)):
+            alpha.append(self.log_likelihood(strain_data[i], stress_data[i],
+                                             x_i[0], x_i[1]))
+        return self.log_prior(x_i) * np.prod(alpha)
 
     # def proposal_distribution(self):
     #     """
