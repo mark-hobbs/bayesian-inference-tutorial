@@ -88,11 +88,12 @@ class LinearElasticityPerfectPlasticity():
         plt.xlabel("Strain $\epsilon$")
         plt.ylabel("Stress $\sigma$")
 
-    def generate_synthetic_data(self, strain, n_data_points):
+    def generate_synthetic_data(self, strain, n_data_points, seed=None):
         """
         The noise in the stress measurements is a normal distribution with a
         zero mean and a standard deviation of s_noise
         """
+        np.random.seed(seed)
         strain_data = np.random.choice(strain, n_data_points)
         stress_data = np.zeros(n_data_points)
 
