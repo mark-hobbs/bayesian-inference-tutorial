@@ -27,7 +27,7 @@ class LinearElasticity(MaterialModel):
     pass
 
 
-class LinearElasticityPerfectPlasticity():
+class LinearElasticityPerfectPlasticity(MaterialModel):
     """
     Linear Elasticity-Perfect Plasticity material model class
 
@@ -69,7 +69,7 @@ class LinearElasticityPerfectPlasticity():
 
         strain_y = stress_y / E
 
-        if strain < strain_y:
+        if strain <= strain_y:
             return E * strain
         elif strain > strain_y:
             return stress_y
@@ -355,7 +355,87 @@ class LinearElasticityPerfectPlasticity():
 
 
 class LinearElasticityLinearHardening(MaterialModel):
-    pass
+    """
+    Linear Elasticity-Linear Hardening material model class
+
+    Attributes
+    ----------
+    n_p : int
+        Number of unknown parameters
+
+    E : float
+        Young's modulus (exact value that we wish to infer from the noisy
+        experimental observations)
+
+    stress_y : float
+        Yield stress (exact value that we wish to infer from the noisy
+        experimental observations)
+
+    H : float
+        Plastic modulus (exact value that we wish to infer from the noise
+        experimental observations)
+
+    s_noise : float
+        Noise in the stress observations (determined via calibration of the
+        testing machine). Normal distribution with a zero mean and a standard
+        deviation of s_noise.
+
+    Methods
+    -------
+
+    Notes
+    -----
+    """
+
+    def __init__(self, E, stress_y, H, s_noise):
+        self.n_p = 3
+        self.E = E
+        self.stress_y = stress_y
+        self.H = H
+
+        self.s_noise = s_noise
+        self.x_prior = None
+        self.cov_matrix_prior = None
+
+    def calculate_stress(self, E, stress_y, H, strain):
+
+        strain_y = stress_y / E
+
+        if strain <= strain_y:
+            return E * strain
+        elif strain > strain_y:
+            strain_p = strain - strain_y
+            return stress_y + (H * strain_p)
+
+    def stress_strain_response(self, strain):
+        """
+        Plot the stress-strain response
+        """
+        stress = np.zeros(np.size(strain))
+        for i in range(len(strain)):
+            stress[i] = self.calculate_stress(self.E, self.stress_y, self.H,
+                                              strain[i])
+
+        plt.plot(strain, stress)
+        plt.title("Stress-strain graph")
+        plt.xlabel("Strain $\epsilon$")
+        plt.ylabel("Stress $\sigma$")
+
+    def generate_synthetic_data(self, strain, n_data_points, seed=None):
+        """
+        The noise in the stress measurements is a normal distribution with a
+        zero mean and a standard deviation of s_noise
+        """
+        np.random.seed(seed)
+        strain_data = np.random.choice(strain, n_data_points)
+        stress_data = np.zeros(n_data_points)
+
+        for i in range(len(stress_data)):
+            stress_data[i] = (self.calculate_stress(self.E, self.stress_y,
+                              self.H, strain_data[i])
+                              + (self.s_noise * np.random.normal()))
+
+        return strain_data, stress_data
 
 
 class LinearElasticityNonlinearHardening(MaterialModel):
