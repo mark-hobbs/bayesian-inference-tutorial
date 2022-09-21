@@ -413,8 +413,8 @@ class LinearElasticityLinearHardening(MaterialModel):
         """
         stress = np.zeros(np.size(strain))
         for i in range(len(strain)):
-            stress[i] = self.calculate_stress(self.E, self.stress_y, self.H,
-                                              strain[i])
+            stress[i] = self.calculate_stress(self.E, self.stress_y,
+                                              self.H, strain[i])
 
         plt.plot(strain, stress)
         plt.title("Stress-strain graph")
@@ -432,10 +432,106 @@ class LinearElasticityLinearHardening(MaterialModel):
 
         for i in range(len(stress_data)):
             stress_data[i] = (self.calculate_stress(self.E, self.stress_y,
-                              self.H, strain_data[i])
+                                                    self.H, strain_data[i])
                               + (self.s_noise * np.random.normal()))
 
         return strain_data, stress_data
+
+    def set_priors(self, x_prior, cov_matrix_prior):
+        """
+        It is considered bad practice to set attributes outside of the
+        __init__ method
+        """
+        self.x_prior = x_prior
+        self.cov_matrix_prior = cov_matrix_prior
+
+    def likelihood(self, strain, stress, E_candidate, stress_y_candidate,
+                 H_candidate):
+        """
+        Likelihood function for a single stress measurement
+
+        Parameters
+        ----------
+        s_noise : float
+            Noise in the stress measurement (determined experimentally)
+
+        strain : float
+            Experimentally measured strain
+
+        stress : float
+            Experimentally measured stress
+
+        E_candidate : float
+            Young's modulus candidate
+
+        stress_y_candidate : float
+            Yield stress candidate
+
+        H_candidate : float
+            Plastic modulus candidate
+
+        Returns
+        -------
+        likelihood : float
+            Likelihood for a single stress measurement
+
+        """
+        alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
+        beta = stress - self.calculate_stress(E_candidate,
+                                              stress_y_candidate,
+                                              H_candidate,
+                                              strain)
+        return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
+
+    def prior(self, x_i):
+        """
+        Prior distribution
+
+        Parameters
+        ----------
+        x_i : ndarray
+            Candidate vector [E, stress_y]
+
+        x_prior : ndarray
+            Prior vector [E, stress_y]
+            TODO: is this variable a prior? or just an initial guess?
+
+        cov_matrix : ndarray
+            Covariance matrix
+
+        Returns
+        -------
+
+        """
+        inv_cov_matrix = np.linalg.inv(self.cov_matrix_prior)
+        numerator = np.matmul(np.transpose(x_i - self.x_prior),
+                              np.matmul(inv_cov_matrix, x_i - self.x_prior))
+        return np.exp(-numerator / 2)
+
+    def posterior(self, strain_data, stress_data, x_i):
+        """
+        Calculate the posterior
+
+        Parameters
+        ----------
+        strain_data : ndarray
+            Experimentally measured strain data
+
+        stress_data : ndarray
+            Experimental measured stress data
+
+        x_i : ndarray
+            Candidate vector [E, stress_y]
+
+        Returns
+        -------
+
+        """
+        alpha = []
+        for i in range(len(stress_data)):
+            alpha.append(self.likelihood(strain_data[i], stress_data[i],
+                                         x_i[0], x_i[1], x_i[2]))
+        return self.prior(x_i) * np.prod(alpha)
 
 
 class LinearElasticityNonlinearHardening(MaterialModel):
