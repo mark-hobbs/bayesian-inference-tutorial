@@ -65,7 +65,9 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
         self.x_prior = None
         self.cov_matrix_prior = None
 
-    def calculate_stress(self, E, stress_y, strain):
+    def calculate_stress(self, strain, E=None, stress_y=None):
+        E = E or self.E
+        stress_y = stress_y or self.stress_y
 
         strain_y = stress_y / E
 
@@ -80,8 +82,7 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
         """
         stress = np.zeros(np.size(strain))
         for i in range(len(strain)):
-            stress[i] = self.calculate_stress(self.E, self.stress_y,
-                                              strain[i])
+            stress[i] = self.calculate_stress(strain[i])
 
         plt.plot(strain, stress)
         plt.title("Stress-strain graph")
@@ -98,8 +99,7 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
         stress_data = np.zeros(n_data_points)
 
         for i in range(len(stress_data)):
-            stress_data[i] = (self.calculate_stress(self.E, self.stress_y,
-                              strain_data[i])
+            stress_data[i] = (self.calculate_stress(strain_data[i])
                               + (self.s_noise * np.random.normal()))
 
         return strain_data, stress_data
@@ -140,9 +140,9 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
 
         """
         alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
-        beta = stress - self.calculate_stress(E_candidate,
-                                              stress_y_candidate,
-                                              strain)
+        beta = stress - self.calculate_stress(strain,
+                                              E=E_candidate,
+                                              stress_y=stress_y_candidate)
         return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
 
     def likelihood_(self, strain_data, stress_data,
@@ -177,9 +177,10 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
         beta = 0
         for i in range(len(stress_data)):
             beta += (stress_data[i]
-                     - self.calculate_stress(E_candidate,
-                                             stress_y_candidate,
-                                             strain_data[i])) ** 2
+                     - self.calculate_stress(strain_data[i],
+                                             E=E_candidate,
+                                             stress_y=stress_y_candidate,
+                                             )) ** 2
         return alpha * np.exp(- beta / (2 * self.s_noise ** 2))
 
     def log_likelihood(self, strain, stress, E_candidate, stress_y_candidate):
@@ -397,7 +398,10 @@ class LinearElasticityLinearHardening(MaterialModel):
         self.x_prior = None
         self.cov_matrix_prior = None
 
-    def calculate_stress(self, E, stress_y, H, strain):
+    def calculate_stress(self, strain, E=None, stress_y=None, H=None):
+        E = E or self.E
+        stress_y = stress_y or self.stress_y
+        H = H or self.H
 
         strain_y = stress_y / E
 
@@ -413,8 +417,7 @@ class LinearElasticityLinearHardening(MaterialModel):
         """
         stress = np.zeros(np.size(strain))
         for i in range(len(strain)):
-            stress[i] = self.calculate_stress(self.E, self.stress_y,
-                                              self.H, strain[i])
+            stress[i] = self.calculate_stress(strain[i])
 
         plt.plot(strain, stress)
         plt.title("Stress-strain graph")
@@ -431,8 +434,7 @@ class LinearElasticityLinearHardening(MaterialModel):
         stress_data = np.zeros(n_data_points)
 
         for i in range(len(stress_data)):
-            stress_data[i] = (self.calculate_stress(self.E, self.stress_y,
-                                                    self.H, strain_data[i])
+            stress_data[i] = (self.calculate_stress(strain_data[i])
                               + (self.s_noise * np.random.normal()))
 
         return strain_data, stress_data
@@ -446,7 +448,7 @@ class LinearElasticityLinearHardening(MaterialModel):
         self.cov_matrix_prior = cov_matrix_prior
 
     def likelihood(self, strain, stress, E_candidate, stress_y_candidate,
-                 H_candidate):
+                   H_candidate):
         """
         Likelihood function for a single stress measurement
 
@@ -475,12 +477,15 @@ class LinearElasticityLinearHardening(MaterialModel):
         likelihood : float
             Likelihood for a single stress measurement
 
+        # TODO: Is it possible to move this and the prior function to the
+        parent class?
+
         """
         alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
-        beta = stress - self.calculate_stress(E_candidate,
-                                              stress_y_candidate,
-                                              H_candidate,
-                                              strain)
+        beta = stress - self.calculate_stress(strain,
+                                              E=E_candidate,
+                                              stress_y=stress_y_candidate,
+                                              H=H_candidate)
         return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
 
     def prior(self, x_i):
