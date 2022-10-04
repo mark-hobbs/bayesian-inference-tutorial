@@ -7,19 +7,71 @@ class MaterialModel():
     def __init__(self):
         pass
 
-    def calculate_stress(self):
-        pass
-
-    def stress_strain_response(self):
-        pass
-
-    def generate_synthetic_data(self):
-        pass
-
-    def noise_model(self):
+    def stress_strain_response(self, strain):
         """
-        Additive noise model
+        Plot the stress-strain response
         """
+        stress = np.zeros(np.size(strain))
+        for i in range(len(strain)):
+            stress[i] = self.calculate_stress(strain[i])
+
+        plt.plot(strain, stress)
+        plt.title("Stress-strain graph")
+        plt.xlabel("Strain $\epsilon$")
+        plt.ylabel("Stress $\sigma$")
+
+    def generate_synthetic_data(self, strain, n_data_points, seed=None):
+        """
+        The noise in the stress measurements is a normal distribution with a
+        zero mean and a standard deviation of s_noise
+        """
+        np.random.seed(seed)
+        strain_data = np.random.choice(strain, n_data_points)
+        stress_data = np.zeros(n_data_points)
+
+        for i in range(len(stress_data)):
+            stress_data[i] = (self.calculate_stress(strain_data[i])
+                              + (self.s_noise * np.random.normal()))
+
+        return strain_data, stress_data
+
+    def set_priors(self, x_prior, cov_matrix_prior):
+        """
+        It is considered bad practice to set attributes outside of the
+        __init__ method
+        """
+        self.x_prior = x_prior
+        self.cov_matrix_prior = cov_matrix_prior
+
+    def likelihood(self):
+        pass
+
+    def prior(self, x_i):
+        """
+        Prior distribution
+
+        Parameters
+        ----------
+        x_i : ndarray
+            Candidate vector [E, stress_y]
+
+        x_prior : ndarray
+            Prior vector [E, stress_y]
+            TODO: is this variable a prior? or just an initial guess?
+
+        cov_matrix : ndarray
+            Covariance matrix
+
+        Returns
+        -------
+
+        """
+        inv_cov_matrix = np.linalg.inv(self.cov_matrix_prior)
+        numerator = np.matmul(np.transpose(x_i - self.x_prior),
+                              np.matmul(inv_cov_matrix, x_i - self.x_prior))
+        return np.exp(-numerator / 2)
+
+    def posterior(self):
         pass
 
 
@@ -75,42 +127,6 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
             return E * strain
         elif strain > strain_y:
             return stress_y
-
-    def stress_strain_response(self, strain):
-        """
-        Plot the stress-strain response
-        """
-        stress = np.zeros(np.size(strain))
-        for i in range(len(strain)):
-            stress[i] = self.calculate_stress(strain[i])
-
-        plt.plot(strain, stress)
-        plt.title("Stress-strain graph")
-        plt.xlabel("Strain $\epsilon$")
-        plt.ylabel("Stress $\sigma$")
-
-    def generate_synthetic_data(self, strain, n_data_points, seed=None):
-        """
-        The noise in the stress measurements is a normal distribution with a
-        zero mean and a standard deviation of s_noise
-        """
-        np.random.seed(seed)
-        strain_data = np.random.choice(strain, n_data_points)
-        stress_data = np.zeros(n_data_points)
-
-        for i in range(len(stress_data)):
-            stress_data[i] = (self.calculate_stress(strain_data[i])
-                              + (self.s_noise * np.random.normal()))
-
-        return strain_data, stress_data
-
-    def set_priors(self, x_prior, cov_matrix_prior):
-        """
-        It is considered bad practice to set attributes outside of the
-        __init__ method
-        """
-        self.x_prior = x_prior
-        self.cov_matrix_prior = cov_matrix_prior
 
     def likelihood(self, strain, stress, E_candidate, stress_y_candidate):
         """
@@ -216,31 +232,6 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
         return np.log(self.likelihood(strain, stress, E_candidate,
                                       stress_y_candidate))
 
-    def prior(self, x_i):
-        """
-        Prior distribution
-
-        Parameters
-        ----------
-        x_i : ndarray
-            Candidate vector [E, stress_y]
-
-        x_prior : ndarray
-            Prior vector [E, stress_y]
-            TODO: is this variable a prior? or just an initial guess?
-
-        cov_matrix : ndarray
-            Covariance matrix
-
-        Returns
-        -------
-
-        """
-        inv_cov_matrix = np.linalg.inv(self.cov_matrix_prior)
-        numerator = np.matmul(np.transpose(x_i - self.x_prior),
-                              np.matmul(inv_cov_matrix, x_i - self.x_prior))
-        return np.exp(-numerator / 2)
-
     def log_prior(self, x_i):
         """
         Log-prior distribution
@@ -335,26 +326,6 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
                                              x_i[0], x_i[1]))
         return self.log_prior(x_i) * np.prod(alpha)
 
-    # def proposal_distribution(self):
-    #     """
-    #     Proposal distribution (q)
-
-    #     Parameters
-    #     ----------
-
-    #     Returns
-    #     -------
-
-    #     Notes
-    #     -----
-    #     See Eq. (53) in Hussein et al., (2020)
-
-    #     """
-    #     a = -1 / (2 * self.gamma**2)
-    #     b = np.linalg.norm(x_i - x_p)
-    #     return np.exp(a * b**2)
-
-
 class LinearElasticityLinearHardening(MaterialModel):
     """
     Linear Elasticity-Linear Hardening material model class
@@ -411,42 +382,6 @@ class LinearElasticityLinearHardening(MaterialModel):
             strain_p = strain - strain_y
             return stress_y + (H * strain_p)
 
-    def stress_strain_response(self, strain):
-        """
-        Plot the stress-strain response
-        """
-        stress = np.zeros(np.size(strain))
-        for i in range(len(strain)):
-            stress[i] = self.calculate_stress(strain[i])
-
-        plt.plot(strain, stress)
-        plt.title("Stress-strain graph")
-        plt.xlabel("Strain $\epsilon$")
-        plt.ylabel("Stress $\sigma$")
-
-    def generate_synthetic_data(self, strain, n_data_points, seed=None):
-        """
-        The noise in the stress measurements is a normal distribution with a
-        zero mean and a standard deviation of s_noise
-        """
-        np.random.seed(seed)
-        strain_data = np.random.choice(strain, n_data_points)
-        stress_data = np.zeros(n_data_points)
-
-        for i in range(len(stress_data)):
-            stress_data[i] = (self.calculate_stress(strain_data[i])
-                              + (self.s_noise * np.random.normal()))
-
-        return strain_data, stress_data
-
-    def set_priors(self, x_prior, cov_matrix_prior):
-        """
-        It is considered bad practice to set attributes outside of the
-        __init__ method
-        """
-        self.x_prior = x_prior
-        self.cov_matrix_prior = cov_matrix_prior
-
     def likelihood(self, strain, stress, E_candidate, stress_y_candidate,
                    H_candidate):
         """
@@ -487,31 +422,6 @@ class LinearElasticityLinearHardening(MaterialModel):
                                               stress_y=stress_y_candidate,
                                               H=H_candidate)
         return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
-
-    def prior(self, x_i):
-        """
-        Prior distribution
-
-        Parameters
-        ----------
-        x_i : ndarray
-            Candidate vector [E, stress_y]
-
-        x_prior : ndarray
-            Prior vector [E, stress_y]
-            TODO: is this variable a prior? or just an initial guess?
-
-        cov_matrix : ndarray
-            Covariance matrix
-
-        Returns
-        -------
-
-        """
-        inv_cov_matrix = np.linalg.inv(self.cov_matrix_prior)
-        numerator = np.matmul(np.transpose(x_i - self.x_prior),
-                              np.matmul(inv_cov_matrix, x_i - self.x_prior))
-        return np.exp(-numerator / 2)
 
     def posterior(self, strain_data, stress_data, x_i):
         """
