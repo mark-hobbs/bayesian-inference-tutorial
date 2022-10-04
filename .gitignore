@@ -133,3 +133,6 @@ dmypy.json
 
 # Matlab code
 /original_code
+
+# Folders
+/figures
