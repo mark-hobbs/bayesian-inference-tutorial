@@ -233,6 +233,11 @@ class MetropolisHastings(Sampler):
     def calculate_95_percent_credible_region(self):
         pass
 
+    def calculate_PPD():
+        """
+        Calculate the posterior predictive distribution (PPD)
+        """
+        pass
 
 class AdaptiveMetropolisHastings(Sampler):
     """
