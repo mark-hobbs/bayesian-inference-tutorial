@@ -18,22 +18,31 @@ The aim of this contribution is to explain in a straightforward manner how Bayes
 
 ---
 
+### Core concepts
+
+There are a number of notebooks to explain the core concepts required to follow the example problems.
+
+1) Bayesian inference
+2) Markov Chain Monte Carlo (MCMC)
+    - Standard Metropolis-Hastings algorithm
+    - The adaptive Metropolis-Hastings algorithm
+3) Posterior Predictive Distribution (PPD)
+
+---
+
 ### Example problems
 
-There are four examples and accompanying notebooks to further explain the core concepts:
+There are four examples:
 
 1) Linear Elasticity
 2) Linear Elasticity-Perfect Plasticity
 3) Linear Elasticity-Linear Hardening
 4) Linear Elasticity-Nonlinear Hardening
 
-- a) Bayesian inference
-- b) Markov Chain Monte Carlo (MCMC)
-    - Standard Metropolis-Hastings algorithm
-    - The adaptive Metropolis-Hastings algorithm
-- c) Posterior Predictive Distribution (PPD)
-- d) Noise in both stress and strain
-- e) Model uncertainty
+There are two further examples that explain more advanced concepts: 
+
+1) Noise in both stress and strain
+2) Model uncertainty
 
 ---
 
