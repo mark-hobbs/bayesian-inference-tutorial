@@ -20,12 +20,20 @@ The aim of this contribution is to explain in a straightforward manner how Bayes
 
 ### Example problems
 
-There are four examples:
+There are four examples and accompanying notebooks to further explain the core concepts:
 
 1) Linear Elasticity
 2) Linear Elasticity-Perfect Plasticity
 3) Linear Elasticity-Linear Hardening
 4) Linear Elasticity-Nonlinear Hardening
+
+- Bayesian inference
+- Markov Chain Monte Carlo (MCMC)
+    - Standard Metropolis-Hastings algorithm
+    - The adaptive Metropolis-Hastings algorithm
+- Posterior Predictive Distribution (PPD)
+- Noise in both stress and strain
+- Model uncertainty
 
 ---
 
