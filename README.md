@@ -27,13 +27,13 @@ There are four examples and accompanying notebooks to further explain the core c
 3) Linear Elasticity-Linear Hardening
 4) Linear Elasticity-Nonlinear Hardening
 
-a) Bayesian inference
-b) Markov Chain Monte Carlo (MCMC)
-    b.1) Standard Metropolis-Hastings algorithm
-    b.2) The adaptive Metropolis-Hastings algorithm
-c) Posterior Predictive Distribution (PPD)
-d) Noise in both stress and strain
-e) Model uncertainty
+- a) Bayesian inference
+- b) Markov Chain Monte Carlo (MCMC)
+    - Standard Metropolis-Hastings algorithm
+    - The adaptive Metropolis-Hastings algorithm
+- c) Posterior Predictive Distribution (PPD)
+- d) Noise in both stress and strain
+- e) Model uncertainty
 
 ---
 
