@@ -9,6 +9,18 @@ class Sampler():
     def __init__(self):
         pass
 
+    def plot_chain_histogram(self):
+        """
+        Histogram of the Markov chain
+        """
+        pass
+
+    def plot_chain_density(self):
+        """
+        Density plot of the Markov chain
+        """
+        pass
+
 
 class MetropolisHastings(Sampler):
     """
@@ -319,12 +331,19 @@ class AdaptiveMetropolisHastings(Sampler):
         pdf_hist : ndarray
             Probability density of every sample
 
+        accept_rate: ndarray
+            The optimal acceptance rate is 0.25. If the acceptance rate is too
+            high or too low it will slow down the convergence of the Markov
+            chain.
+
         """
         x_i = x_0.copy()
         x_hist = np.zeros([self.n_samples, self.model.n_p])
         pdf_hist = np.zeros(self.n_samples)
+        accept_rate = np.zeros(self.n_samples)
         K = np.zeros([self.n_K, self.model.n_p])
         K_tilde = self.calculate_K_tilde(K)
+        n_accept = 0
         counter = 0
 
         for i in tqdm(range(self.n_samples)):
@@ -334,13 +353,14 @@ class AdaptiveMetropolisHastings(Sampler):
                 K_tilde = self.calculate_K_tilde(K)
                 counter += 1
 
-            x_i, pdf = self.sample_step(x_i, K_tilde)
+            x_i, pdf, n_accept = self.sample_step(x_i, K_tilde, n_accept)
             x_hist[i, :] = np.transpose(x_i)
             pdf_hist[i] = pdf
+            accept_rate[i] = n_accept / (i + 1)
 
-        return x_hist, pdf_hist
+        return x_hist, pdf_hist, accept_rate
 
-    def sample_step(self, x_i, K_tilde):
+    def sample_step(self, x_i, K_tilde, n_accept):
         """
         Draw a new sample using the Metropolis-Hastings algorithm with the
         adaptive proposal technique
@@ -359,9 +379,9 @@ class AdaptiveMetropolisHastings(Sampler):
         x_p = self.draw_proposal(x_i, K_tilde)
         pi_x_i = self.calculate_posterior(x_i)
         pi_x_p = self.calculate_posterior(x_p)
-        return self.accept_or_reject(x_i, x_p, pi_x_i, pi_x_p)
+        return self.accept_or_reject(x_i, x_p, pi_x_i, pi_x_p, n_accept)
 
-    def accept_or_reject(self, x_i, x_p, pi_x_i, pi_x_p):
+    def accept_or_reject(self, x_i, x_p, pi_x_i, pi_x_p, n_accept):
         """
         Accept of reject a new candidate
 
@@ -381,9 +401,10 @@ class AdaptiveMetropolisHastings(Sampler):
         alpha = self.calculate_acceptance_ratio(pi_x_p, pi_x_i)
         u = self.generate_uniform_random_number()
         if u <= alpha:  # Accept proposal
-            return x_p, pi_x_p
+            n_accept += 1
+            return x_p, pi_x_p, n_accept
         if u > alpha:  # Reject proposal
-            return x_i, pi_x_i
+            return x_i, pi_x_i, n_accept
 
     def calculate_acceptance_ratio(self, pi_x_p, pi_x_i):
         return min(1, pi_x_p / pi_x_i)
