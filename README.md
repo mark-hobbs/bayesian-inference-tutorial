@@ -8,11 +8,11 @@ THIS IS A WORK IN PROGRESS!
 
 This repository contains Jupyter Notebooks to recreate the examples published in the following paper ([link](https://doi.org/10.1007/s11831-018-09311-x)):
 
-Rappel, H., Beex, L. A., Hale, J. S., Noels, L., & Bordas, S. P. A. (2020). A tutorial on Bayesian inference to identify material parameters in solid mechanics. *Archives of Computational Methods in Engineering*, 27(2), 361-385.
+>Rappel, H., Beex, L. A., Hale, J. S., Noels, L., & Bordas, S. P. A. (2020). A tutorial on Bayesian inference to identify material parameters in solid mechanics. *Archives of Computational Methods in Engineering*, 27(2), 361-385.
 
-The reader might also be interested in the following paper ([link](https://doi.org/10.1016/j.probengmech.2018.08.004))
+The reader might also be interested in the following paper ([link](https://doi.org/10.1016/j.probengmech.2018.08.004)):
 
-Rappel, H., Beex, L. A., Noels, L., & Bordas, S. P. A. (2019). Identifying elastoplastic parameters with Bayes’ theorem considering output error, input error and model uncertainty. *Probabilistic Engineering Mechanics*, 55, 28-41.
+>Rappel, H., Beex, L. A., Noels, L., & Bordas, S. P. A. (2019). Identifying elastoplastic parameters with Bayes’ theorem considering output error, input error and model uncertainty. *Probabilistic Engineering Mechanics*, 55, 28-41.
 
 ---
 
