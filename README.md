@@ -24,7 +24,7 @@ The aim of this contribution is to explain in a straightforward manner how Bayes
 
 ### Core concepts
 
-There are a number of notebooks to explain the core concepts required to follow the example problems.
+There are a number of notebooks to explain the core concepts required to understand the example problems.
 
 1) Bayesian inference
 2) Markov Chain Monte Carlo (MCMC)
