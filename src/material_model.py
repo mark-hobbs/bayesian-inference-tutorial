@@ -326,6 +326,7 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
                                              x_i[0], x_i[1]))
         return self.log_prior(x_i) * np.prod(alpha)
 
+
 class LinearElasticityLinearHardening(MaterialModel):
     """
     Linear Elasticity-Linear Hardening material model class
