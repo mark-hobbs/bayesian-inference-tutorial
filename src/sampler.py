@@ -251,6 +251,26 @@ class MetropolisHastings(Sampler):
         x_hist_burned = x_hist[self.burn:]
         return np.cov(np.transpose(x_hist_burned))
 
+    def calculate_MAP_point(self, x_hist, pdf_hist):
+        """
+        Calculate the maximum a posteriori probability (MAP) point - the point
+        at which the posterior distribution is (globally) maximum
+
+        Parameters
+        ----------
+        x_hist : ndarray
+
+        pdf_hist : ndarray
+
+        Returns
+        -------
+        MAP_point : ndarray
+
+        """
+        x_hist_burned = x_hist[self.burn:]
+        pdf_hist_burned = pdf_hist[self.burn:]
+        return x_hist_burned[np.argmax(pdf_hist_burned), :]
+
     def calculate_95_percent_credible_region(self):
         pass
 
