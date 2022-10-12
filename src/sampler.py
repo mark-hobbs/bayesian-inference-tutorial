@@ -9,6 +9,60 @@ class Sampler():
     def __init__(self):
         pass
 
+    def calculate_mean(self, x_hist):
+        """
+        Calculate the mean of the posterior distribution
+
+        Parameters
+        ----------
+        x_hist : ndarray
+
+        Returns
+        -------
+        x_mean : ndarray
+
+        TODO: move to Sampler or Utilities class
+
+        """
+        x_hist_burned = x_hist[self.burn:]
+        return np.mean(x_hist_burned, 0)
+
+    def calculate_covariance(self, x_hist):
+        """
+        Calculate the covariance (correlation) between the model parameters
+
+        Parameters
+        ----------
+        x_hist : ndarray
+
+        Returns
+        -------
+        x_cov : ndarray
+
+        """
+        x_hist_burned = x_hist[self.burn:]
+        return np.cov(np.transpose(x_hist_burned))
+
+    def calculate_MAP_point(self, x_hist, pdf_hist):
+        """
+        Calculate the maximum a posteriori probability (MAP) point - the point
+        at which the posterior distribution is (globally) maximum
+
+        Parameters
+        ----------
+        x_hist : ndarray
+
+        pdf_hist : ndarray
+
+        Returns
+        -------
+        MAP_point : ndarray
+
+        """
+        x_hist_burned = x_hist[self.burn:]
+        pdf_hist_burned = pdf_hist[self.burn:]
+        return x_hist_burned[np.argmax(pdf_hist_burned), :]
+
     def plot_chain_histogram(self):
         """
         Histogram of the Markov chain
@@ -217,60 +271,6 @@ class MetropolisHastings(Sampler):
         """
         return self.step_size / np.sqrt(self.model.n_p)
 
-    def calculate_mean(self, x_hist):
-        """
-        Calculate the mean of the posterior distribution
-
-        Parameters
-        ----------
-        x_hist : ndarray
-
-        Returns
-        -------
-        x_mean : ndarray
-
-        TODO: move to Sampler or Utilities class
-
-        """
-        x_hist_burned = x_hist[self.burn:]
-        return np.mean(x_hist_burned, 0)
-
-    def calculate_covariance(self, x_hist):
-        """
-        Calculate the covariance (correlation) between the model parameters
-
-        Parameters
-        ----------
-        x_hist : ndarray
-
-        Returns
-        -------
-        x_cov : ndarray
-
-        """
-        x_hist_burned = x_hist[self.burn:]
-        return np.cov(np.transpose(x_hist_burned))
-
-    def calculate_MAP_point(self, x_hist, pdf_hist):
-        """
-        Calculate the maximum a posteriori probability (MAP) point - the point
-        at which the posterior distribution is (globally) maximum
-
-        Parameters
-        ----------
-        x_hist : ndarray
-
-        pdf_hist : ndarray
-
-        Returns
-        -------
-        MAP_point : ndarray
-
-        """
-        x_hist_burned = x_hist[self.burn:]
-        pdf_hist_burned = pdf_hist[self.burn:]
-        return x_hist_burned[np.argmax(pdf_hist_burned), :]
-
     def calculate_95_percent_credible_region(self):
         pass
 
@@ -279,6 +279,7 @@ class MetropolisHastings(Sampler):
         Calculate the posterior predictive distribution (PPD)
         """
         pass
+
 
 class AdaptiveMetropolisHastings(Sampler):
     """
@@ -325,7 +326,7 @@ class AdaptiveMetropolisHastings(Sampler):
     """
 
     def __init__(self, model, data, n_samples=1E4, burn=3E3, update_freq=1E3,
-                step_size=2.38):
+                 step_size=2.38):
         self.model = model
         self.data = data
         self.n_samples = int(n_samples)
