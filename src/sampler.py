@@ -1,5 +1,4 @@
 
-from turtle import update
 import numpy as np
 from tqdm import tqdm
 
@@ -272,12 +271,6 @@ class MetropolisHastings(Sampler):
         return self.step_size / np.sqrt(self.model.n_p)
 
     def calculate_95_percent_credible_region(self):
-        pass
-
-    def calculate_PPD():
-        """
-        Calculate the posterior predictive distribution (PPD)
-        """
         pass
 
 

@@ -326,6 +326,28 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
                                              x_i[0], x_i[1]))
         return self.log_prior(x_i) * np.prod(alpha)
 
+    def calculate_PPD(self, strain, x_hist, burn=3000):
+        """
+        Calculate the posterior predictive distribution (PPD)
+
+        TODO: move method to a more suitable class?
+        """
+
+        for sample in x_hist[burn:]:
+            stress = np.zeros(np.size(strain))
+
+            for i in range(len(strain)):
+                stress[i] = self.calculate_stress(strain[i], E=sample[0],
+                                                  stress_y=sample[1])
+
+            plt.plot(strain, stress, color='dimgray', alpha=.005)
+            plt.title("Stress-strain graph")
+            plt.xlabel("Strain $\epsilon$")
+            plt.ylabel("Stress $\sigma$")
+
+        strain_data, stress_data = self.generate_synthetic_data(strain, 100)
+        plt.scatter(strain_data, stress_data)
+
 
 class LinearElasticityLinearHardening(MaterialModel):
     """
