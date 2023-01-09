@@ -76,7 +76,38 @@ class MaterialModel():
 
 
 class LinearElasticity(MaterialModel):
-    pass
+    """
+    Linear Elastic material model class
+
+    Attributes
+    ----------
+    n_p : int
+        Number of unknown parameters
+
+    E : float
+        Young's modulus (exact value that we wish to infer from the noisy
+        experimental observations)
+
+    s_noise : float
+        Noise in the stress observations (determined via calibration of the
+        testing machine). Normal distribution with a zero mean and a standard
+        deviation of s_noise.
+            Methods
+    -------
+
+    Notes
+    -----
+    """
+
+    def __init__(self, E, s_noise):
+        self.n_p = 1
+        self.E = E
+
+        self.s_noise = s_noise
+
+    def calculate_stress(self, strain, E=None):
+        E = E or self.E
+        return E * strain 
 
 
 class LinearElasticityPerfectPlasticity(MaterialModel):
