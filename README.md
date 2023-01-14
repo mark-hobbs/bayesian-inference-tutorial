@@ -14,6 +14,12 @@ The reader might also be interested in the following paper ([link](https://doi.o
 
 >Rappel, H., Beex, L. A., Noels, L., & Bordas, S. P. A. (2019). Identifying elastoplastic parameters with Bayes’ theorem considering output error, input error and model uncertainty. *Probabilistic Engineering Mechanics*, 55, 28-41.
 
+Additional resources that the reader might find useful are listed below
+
+>Hogg, D. W., Bovy, J., & Lang, D. (2010). Data analysis recipes: Fitting a model to data. arXiv preprint [arXiv:1008.4686](https://doi.org/10.48550/arXiv.1008.4686).
+
+>Hogg, D. W., & Foreman-Mackey, D. (2018). Data analysis recipes: Using markov chain monte carlo. *The Astrophysical Journal Supplement Series*, 236(1), 11. [doi.org/10.3847/1538-4365/aab76e](https://doi.org/10.3847/1538-4365/aab76e)
+
 ---
 
 ### Paper abstract
