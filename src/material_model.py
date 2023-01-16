@@ -15,10 +15,11 @@ class MaterialModel():
         for i in range(len(strain)):
             stress[i] = self.calculate_stress(strain[i])
 
-        plt.plot(strain, stress)
+        plt.plot(strain, stress, color='C1', label="True model")
         plt.title("Stress-strain graph")
         plt.xlabel("Strain $\epsilon$")
         plt.ylabel("Stress $\sigma$")
+        plt.legend()
 
     def generate_synthetic_data(self, strain, n_data_points, seed=None):
         """
