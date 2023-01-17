@@ -186,6 +186,11 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
         likelihood : float
             Likelihood for a single stress measurement
 
+        Notes
+        -----
+        TODO: how can we make the likelihood function generic (i.e. move to 
+        parent class)? 
+
         """
         alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
         beta = stress - self.calculate_stress(strain,
@@ -467,7 +472,7 @@ class LinearElasticityLinearHardening(MaterialModel):
         likelihood : float
             Likelihood for a single stress measurement
 
-        # TODO: Is it possible to move this and the prior function to the
+        TODO: Is it possible to move this and the prior function to the
         parent class?
 
         """
