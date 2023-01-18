@@ -93,7 +93,8 @@ class LinearElasticity(MaterialModel):
         Noise in the stress observations (determined via calibration of the
         testing machine). Normal distribution with a zero mean and a standard
         deviation of s_noise.
-            Methods
+    
+    Methods
     -------
 
     Notes
@@ -108,7 +109,27 @@ class LinearElasticity(MaterialModel):
 
     def calculate_stress(self, strain, E=None):
         E = E or self.E
-        return E * strain 
+        return E * strain
+
+    def likelihood(self, strain, stress, E_candidate):
+        alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
+        beta = stress - self.calculate_stress(strain,
+                                              E=E_candidate)
+        return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
+
+    def prior(self, x):
+        """
+        Prior in the form of a modified normal distribution
+
+        Attributes
+        ----------
+        mu : float
+            Mean of the prior distribution
+
+        sigma : float
+            Standard deviation of the prior distribution
+        """
+        return np.exp(-((x - mu)**2 / (2 * sigma**2)))
 
 
 class LinearElasticityPerfectPlasticity(MaterialModel):
