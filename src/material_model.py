@@ -106,6 +106,8 @@ class LinearElasticity(MaterialModel):
         self.E = E
 
         self.s_noise = s_noise
+        self.mu = None
+        self.sigma = None
 
     def calculate_stress(self, strain, E=None):
         E = E or self.E
@@ -129,7 +131,38 @@ class LinearElasticity(MaterialModel):
         sigma : float
             Standard deviation of the prior distribution
         """
-        return np.exp(-((x - mu)**2 / (2 * sigma**2)))
+        return np.exp(-((x - self.mu)**2 / (2 * self.sigma**2)))
+
+    def set_prior(self, mu, sigma):
+        """
+        Set the parameters of the prior distribution
+        """
+        self.mu = mu
+        self.sigma = sigma
+
+    def posterior(self, strain_data, stress_data, x_i):
+        """
+        Calculate the posterior
+
+        Parameters
+        ----------
+        strain_data : ndarray
+            Experimentally measured strain data
+
+        stress_data : ndarray
+            Experimental measured stress data
+
+        x_i : ndarray
+            Candidate parameter (E)
+
+        Returns
+        -------
+
+        """
+        alpha = []
+        for i in range(len(stress_data)):
+            alpha.append(self.likelihood(strain_data[i], stress_data[i], x_i))
+        return self.prior(x_i) * np.prod(alpha)
 
 
 class LinearElasticityPerfectPlasticity(MaterialModel):
