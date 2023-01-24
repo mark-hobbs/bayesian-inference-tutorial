@@ -1,6 +1,6 @@
 # BayesianInference
 
-THIS IS A WORK IN PROGRESS!
+> THIS IS A WORK IN PROGRESS :hourglass:
 
 ---
 
@@ -28,6 +28,22 @@ The aim of this contribution is to explain in a straightforward manner how Bayes
 
 ---
 
+### Example problems
+
+There are four examples:
+
+1) [Linear Elasticity](1_linear_elasticity.ipynb)
+2) [Linear Elasticity-Perfect Plasticity](2_linear_elasticity_perfect_plasticity.ipynb)
+3) [Linear Elasticity-Linear Hardening](3_linear_elasticity_linear_hardening.ipynb)
+4) Linear Elasticity-Nonlinear Hardening
+
+There are two further examples that explain more advanced concepts: 
+
+1) Noise in both stress and strain
+2) Model uncertainty
+
+---
+
 ### Core concepts
 
 There are a number of notebooks to explain the core concepts required to understand the example problems.
@@ -37,22 +53,6 @@ There are a number of notebooks to explain the core concepts required to underst
     - Standard Metropolis-Hastings algorithm
     - The adaptive Metropolis-Hastings algorithm
 3) Posterior Predictive Distribution (PPD)
-
----
-
-### Example problems
-
-There are four examples:
-
-1) Linear Elasticity
-2) Linear Elasticity-Perfect Plasticity
-3) Linear Elasticity-Linear Hardening
-4) Linear Elasticity-Nonlinear Hardening
-
-There are two further examples that explain more advanced concepts: 
-
-1) Noise in both stress and strain
-2) Model uncertainty
 
 ---
 
