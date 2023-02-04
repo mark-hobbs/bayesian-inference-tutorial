@@ -114,9 +114,14 @@ class LinearElasticity(MaterialModel):
         return E * strain
 
     def likelihood(self, strain, stress, E_candidate):
+        """
+        Likelihood for all observations
+        """
         alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
-        beta = stress - self.calculate_stress(strain,
-                                              E=E_candidate)
+        beta = 0
+        for i in range(len(strain)):
+            beta += stress[i] - self.calculate_stress(strain[i],
+                                                      E=E_candidate)
         return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
 
     def prior(self, x):
@@ -159,10 +164,7 @@ class LinearElasticity(MaterialModel):
         -------
 
         """
-        alpha = []
-        for i in range(len(stress_data)):
-            alpha.append(self.likelihood(strain_data[i], stress_data[i], x_i))
-        return self.prior(x_i) * np.prod(alpha)
+        return self.prior(x_i) * self.likelihood(strain_data, stress_data, x_i)
 
 
 class LinearElasticityPerfectPlasticity(MaterialModel):
@@ -214,45 +216,7 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
         elif strain > strain_y:
             return stress_y
 
-    def likelihood(self, strain, stress, E_candidate, stress_y_candidate):
-        """
-        Likelihood function for a single stress measurement
-
-        Parameters
-        ----------
-        s_noise : float
-            Noise in the stress measurement (determined experimentally)
-
-        strain : float
-            Experimentally measured strain
-
-        stress : float
-            Experimentally measured stress
-
-        E_candidate : float
-            Young's modulus candidate
-
-        stress_y_candidate : float
-            Yield stress candidate
-
-        Returns
-        -------
-        likelihood : float
-            Likelihood for a single stress measurement
-
-        Notes
-        -----
-        TODO: how can we make the likelihood function generic (i.e. move to 
-        parent class)? 
-
-        """
-        alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
-        beta = stress - self.calculate_stress(strain,
-                                              E=E_candidate,
-                                              stress_y=stress_y_candidate)
-        return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
-
-    def likelihood_(self, strain_data, stress_data,
+    def likelihood(self, strain_data, stress_data,
                     E_candidate, stress_y_candidate):
         """
         Likelihood function for full data set
@@ -278,6 +242,11 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
         -------
         likelihood : float
             Likelihood
+
+        Notes
+        -----
+        TODO: how can we make the likelihood function generic (i.e. move to 
+        parent class)? 
 
         """
         alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
@@ -364,32 +333,7 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
         -------
 
         """
-        alpha = []
-        for i in range(len(stress_data)):
-            alpha.append(self.likelihood(strain_data[i], stress_data[i],
-                                         x_i[0], x_i[1]))
-        return self.prior(x_i) * np.prod(alpha)
-
-    def posterior_(self, strain_data, stress_data, x_i):
-        """
-        Calculate the posterior
-
-        Parameters
-        ----------
-        strain_data : ndarray
-            Experimentally measured strain data
-
-        stress_data : ndarray
-            Experimental measured stress data
-
-        x_i : ndarray
-            Candidate vector [E, stress_y]
-
-        Returns
-        -------
-
-        """
-        return self.prior(x_i) * self.likelihood_(strain_data, stress_data,
+        return self.prior(x_i) * self.likelihood(strain_data, stress_data,
                                                   x_i[0], x_i[1])
 
     def log_posterior(self, strain_data, stress_data, x_i):
@@ -411,11 +355,7 @@ class LinearElasticityPerfectPlasticity(MaterialModel):
         -------
 
         """
-        alpha = []
-        for i in range(len(stress_data)):
-            alpha.append(self.log_likelihood(strain_data[i], stress_data[i],
-                                             x_i[0], x_i[1]))
-        return self.log_prior(x_i) * np.prod(alpha)
+        return np.log(self.posterior(self, strain_data, stress_data, x_i))
 
     def calculate_PPD(self, strain, x_hist, burn=3000):
         """
@@ -531,11 +471,21 @@ class LinearElasticityLinearHardening(MaterialModel):
 
         """
         alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
-        beta = stress - self.calculate_stress(strain,
-                                              E=E_candidate,
-                                              stress_y=stress_y_candidate,
-                                              H=H_candidate)
-        return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
+        beta = 0
+        for i in range(len(strain)):
+            beta += (stress[i]
+                     - self.calculate_stress(strain[i],
+                                             E=E_candidate,
+                                             stress_y=stress_y_candidate,
+                                             H=H_candidate)) ** 2
+        return alpha * np.exp(- beta / (2 * self.s_noise ** 2))
+
+        # alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
+        # beta = stress - self.calculate_stress(strain,
+        #                                       E=E_candidate,
+        #                                       stress_y=stress_y_candidate,
+        #                                       H=H_candidate)
+        # return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
 
     def posterior(self, strain_data, stress_data, x_i):
         """
@@ -556,11 +506,12 @@ class LinearElasticityLinearHardening(MaterialModel):
         -------
 
         """
-        alpha = []
-        for i in range(len(stress_data)):
-            alpha.append(self.likelihood(strain_data[i], stress_data[i],
-                                         x_i[0], x_i[1], x_i[2]))
-        return self.prior(x_i) * np.prod(alpha)
+        # alpha = []
+        # for i in range(len(stress_data)):
+        #     alpha.append(self.likelihood(strain_data[i], stress_data[i],
+        #                                  x_i[0], x_i[1], x_i[2]))
+        return self.prior(x_i) * self.likelihood(strain_data, stress_data,
+                                                 x_i[0], x_i[1], x_i[2])
 
 
 class LinearElasticityNonlinearHardening(MaterialModel):
