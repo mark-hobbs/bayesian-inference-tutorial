@@ -40,7 +40,7 @@ There are four examples:
 There are two further examples that explain more advanced concepts: 
 
 1) Noise in both stress and strain
-2) Model uncertainty
+2) [Model uncertainty](model_uncertainty.ipynb)
 
 ---
 
