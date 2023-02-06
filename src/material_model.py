@@ -439,7 +439,7 @@ class LinearElasticityLinearHardening(MaterialModel):
     def likelihood(self, strain, stress, E_candidate, stress_y_candidate,
                    H_candidate):
         """
-        Likelihood function for a single stress measurement
+        Likelihood function - all observations
 
         Parameters
         ----------
@@ -464,7 +464,7 @@ class LinearElasticityLinearHardening(MaterialModel):
         Returns
         -------
         likelihood : float
-            Likelihood for a single stress measurement
+            Likelihood for all observations
 
         TODO: Is it possible to move this and the prior function to the
         parent class?
@@ -479,13 +479,6 @@ class LinearElasticityLinearHardening(MaterialModel):
                                              stress_y=stress_y_candidate,
                                              H=H_candidate)) ** 2
         return alpha * np.exp(- beta / (2 * self.s_noise ** 2))
-
-        # alpha = 1 / (self.s_noise * np.sqrt(2 * np.pi))
-        # beta = stress - self.calculate_stress(strain,
-        #                                       E=E_candidate,
-        #                                       stress_y=stress_y_candidate,
-        #                                       H=H_candidate)
-        # return alpha * np.exp(- (beta ** 2) / (2 * self.s_noise ** 2))
 
     def posterior(self, strain_data, stress_data, x_i):
         """
@@ -506,10 +499,6 @@ class LinearElasticityLinearHardening(MaterialModel):
         -------
 
         """
-        # alpha = []
-        # for i in range(len(stress_data)):
-        #     alpha.append(self.likelihood(strain_data[i], stress_data[i],
-        #                                  x_i[0], x_i[1], x_i[2]))
         return self.prior(x_i) * self.likelihood(strain_data, stress_data,
                                                  x_i[0], x_i[1], x_i[2])
 
