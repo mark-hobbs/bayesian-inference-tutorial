@@ -54,6 +54,21 @@ There are a number of notebooks to explain the core concepts required to underst
     - The adaptive Metropolis-Hastings algorithm
 3) Posterior Predictive Distribution (PPD)
 
+
+---
+
+### Getting started
+
+Running the notebooks requires the following dependencies:
+
+- NumPy
+- Matplotlib
+- SciPy
+- Jupyter
+- tqdm
+
+The dependencies are stored in the `Pipfile` contained in the repository and installation is easy using [`Pipenv`](https://pipenv.pypa.io/en/latest/). Clone the repository, ensure that `Pipenv` is installed on the machine, navigate to the root folder and then type `pipenv install` on the command line.
+
 ---
 
 ### Contact
