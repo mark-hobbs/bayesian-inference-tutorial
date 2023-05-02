@@ -1,10 +1,6 @@
-# BayesianInference
+# A tutorial on Bayesian inference to identify material parameters in solid mechanics
 
 > THIS IS A WORK IN PROGRESS :hourglass:
-
----
-
-### A tutorial on Bayesian inference to identify material parameters in solid mechanics
 
 This repository contains Jupyter Notebooks to recreate the examples published in the following paper ([link](https://doi.org/10.1007/s11831-018-09311-x)):
 
