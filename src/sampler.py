@@ -1,9 +1,8 @@
-
 import numpy as np
 from tqdm import tqdm
 
 
-class Sampler():
+class Sampler:
 
     def __init__(self):
         pass
@@ -23,7 +22,7 @@ class Sampler():
         TODO: move to Sampler or Utilities class
 
         """
-        x_hist_burned = x_hist[self.burn:]
+        x_hist_burned = x_hist[self.burn :]
         return np.mean(x_hist_burned, 0)
 
     def calculate_covariance(self, x_hist):
@@ -39,7 +38,7 @@ class Sampler():
         x_cov : ndarray
 
         """
-        x_hist_burned = x_hist[self.burn:]
+        x_hist_burned = x_hist[self.burn :]
         return np.cov(np.transpose(x_hist_burned))
 
     def calculate_MAP_point(self, x_hist, pdf_hist):
@@ -58,8 +57,8 @@ class Sampler():
         MAP_point : ndarray
 
         """
-        x_hist_burned = x_hist[self.burn:]
-        pdf_hist_burned = pdf_hist[self.burn:]
+        x_hist_burned = x_hist[self.burn :]
+        pdf_hist_burned = pdf_hist[self.burn :]
         return x_hist_burned[np.argmax(pdf_hist_burned), :]
 
     def plot_chain_histogram(self):
@@ -109,7 +108,7 @@ class MetropolisHastings(Sampler):
     -----
     """
 
-    def __init__(self, model, data, n_samples=1E4, burn=3E3, step_size=2.38):
+    def __init__(self, model, data, n_samples=1e4, burn=3e3, step_size=2.38):
         self.model = model
         self.data = data
         self.n_samples = int(n_samples)
@@ -241,8 +240,7 @@ class MetropolisHastings(Sampler):
             Proposed sample (candidate sample)
 
         """
-        return x_i + (self.compute_gamma()
-                      * np.random.normal(size=(self.model.n_p, 1)))
+        return x_i + (self.compute_gamma() * np.random.normal(size=(self.model.n_p, 1)))
 
     def compute_gamma(self):
         """
@@ -318,8 +316,9 @@ class AdaptiveMetropolisHastings(Sampler):
     -----
     """
 
-    def __init__(self, model, data, n_samples=1E4, burn=3E3, update_freq=1E3,
-                 step_size=2.38):
+    def __init__(
+        self, model, data, n_samples=1e4, burn=3e3, update_freq=1e3, step_size=2.38
+    ):
         self.model = model
         self.data = data
         self.n_samples = int(n_samples)
@@ -470,9 +469,10 @@ class AdaptiveMetropolisHastings(Sampler):
         Eq. (58) in Rappel et al., (2018)
 
         """
-        return x_i + ((self.compute_gamma() / np.sqrt(self.n_K - 1))
-                      * np.matmul(np.transpose(K_tilde),
-                      np.random.normal(size=(self.n_K, 1))))
+        return x_i + (
+            (self.compute_gamma() / np.sqrt(self.n_K - 1))
+            * np.matmul(np.transpose(K_tilde), np.random.normal(size=(self.n_K, 1)))
+        )
 
     def compute_gamma(self):
         """

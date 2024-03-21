@@ -1,7 +1,4 @@
-
-
-class InferenceData():
-
+class InferenceData:
     """
     Class based on ArviZ InferenceData class
     """
