@@ -16,15 +16,23 @@ Additional resources that the reader might find useful are listed below
 
 - Hogg, D. W., & Foreman-Mackey, D. (2018). Data analysis recipes: Using markov chain monte carlo. *The Astrophysical Journal Supplement Series*, 236(1), 11. [doi.org/10.3847/1538-4365/aab76e](https://doi.org/10.3847/1538-4365/aab76e)
 
----
-
-### Paper abstract
+## Paper abstract
 
 The aim of this contribution is to explain in a straightforward manner how Bayesian inference can be used to identify material parameters of material models for solids. Bayesian approaches have already been used for this purpose, but most of the literature is not necessarily easy to understand for those new to the field. The reason for this is that most literature focuses either on complex statistical and machine learning concepts and/or on relatively complex mechanical models. In order to introduce the approach as gently as possible, we only focus on stress–strain measurements coming from uniaxial tensile tests and we only treat elastic and elastoplastic material models. Furthermore, the stress–strain measurements are created artificially in order to allow a one-to-one comparison between the true parameter values and the identified parameter distributions.
 
----
+## Getting started
 
-### Example problems
+Using [`Pipenv`](https://pipenv.pypa.io/en/latest/):
+
+```shell
+$ git clone https://github.com/mark-hobbs/bayesian-inference-tutorial.git
+$ cd bayesian-inference-tutorial
+$ pipenv install
+$ pipenv shell
+$ jupyter lab
+```
+
+## Example problems
 
 There are four examples:
 
@@ -38,9 +46,8 @@ There are plans to add two additional examples that explain more advanced concep
 1) Noise in both stress and strain
 2) [Model uncertainty](model-uncertainty.ipynb)
 
----
 
-### Core concepts
+## Core concepts
 
 The eventual plan is to write additional notebooks explaining the core concepts necessary for a proper understanding of the example problems:
 
@@ -50,23 +57,20 @@ The eventual plan is to write additional notebooks explaining the core concepts 
     - The adaptive Metropolis-Hastings algorithm
 3) Posterior Predictive Distribution (PPD)
 
----
 
-### Getting started
-
-Running the notebooks requires the following dependencies:
+## Dependencies:
 
 - NumPy
-- Matplotlib
 - SciPy
-- Jupyter
+- Matplotlib
+- JupyterLab
 - tqdm
 
-The dependencies are stored in the `Pipfile` contained in the repository and installation is easy using [`Pipenv`](https://pipenv.pypa.io/en/latest/). Clone the repository, ensure that `Pipenv` is installed on the machine, navigate to the root folder and then type `pipenv install` on the command line.
+**Development dependencies:**
 
----
+- Black
 
-### Contact
+## Contact
 
 If you spot any mistakes then please raise an issue or if you would prefer you can contact me using the following email address:
 
