@@ -33,7 +33,7 @@ There are four examples:
 3) [Linear Elasticity-Linear Hardening](03-linear-elasticity-linear-hardening.ipynb)
 4) Linear Elasticity-Nonlinear Hardening
 
-There are plans to add two further examples that explain more advanced concepts: 
+There are plans to add two additional examples that explain more advanced concepts:
 
 1) Noise in both stress and strain
 2) [Model uncertainty](model-uncertainty.ipynb)
@@ -42,7 +42,7 @@ There are plans to add two further examples that explain more advanced concepts:
 
 ### Core concepts
 
-The eventual plan is to write additional notebooks to explain the core concepts required to properly understand the example problems.
+The eventual plan is to write additional notebooks explaining the core concepts necessary for a proper understanding of the example problems:
 
 1) Bayesian inference
 2) Markov Chain Monte Carlo (MCMC)
