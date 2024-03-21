@@ -58,7 +58,7 @@ The eventual plan is to write additional notebooks explaining the core concepts 
 3) Posterior Predictive Distribution (PPD)
 
 
-## Dependencies:
+## Dependencies
 
 - NumPy
 - SciPy
@@ -66,7 +66,7 @@ The eventual plan is to write additional notebooks explaining the core concepts 
 - JupyterLab
 - tqdm
 
-**Development dependencies:**
+**Development dependencies**
 
 - Black
 
