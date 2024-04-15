@@ -49,7 +49,7 @@ There are plans to add two additional examples that explain more advanced concep
 | Example | Description | Google Colab |
 | ------- | ----------- | ------------ |
 | [Linear Elasticity](examples/01-linear-elasticity.ipynb) | Write `Prior`, `Likelihood`, `Posterior` and `Model` classes, and employ a grid search and the standard Metropolis-Hastings algorithm to infer the model parameters | <a href="https://colab.research.google.com/github/mark-hobbs/PyPD/blob/main/examples/crack_branching.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> |
-| [Linear Elasticity-Perfect Plasticity](examples/02-linear-elasticity-perfect-plasticity.ipynb) | Write a `Sampler` class and employ the Adaptive Metropolis-Hastings | <a href="https://colab.research.google.com/github/mark-hobbs/PyPD/blob/main/examples/half_notched_beam.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> |
+| [Linear Elasticity-Perfect Plasticity](examples/02-linear-elasticity-perfect-plasticity.ipynb) | Write a `Sampler` and `Proposal` class, employ the Adaptive Metropolis-Hastings algorithm, examine sampler performance. Additionally, sample complex posterior distributions to deepen understanding. | <a href="https://colab.research.google.com/github/mark-hobbs/PyPD/blob/main/examples/half_notched_beam.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> |
 | [Linear Elasticity-Linear Hardening](examples/03-linear-elasticity-linear-hardening.ipynb) | | |
 | Linear Elasticity-Nonlinear Hardening | PyMC | |
 
