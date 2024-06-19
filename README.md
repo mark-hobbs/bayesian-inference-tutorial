@@ -12,13 +12,12 @@ The aim of this contribution is to explain in a straightforward manner how Bayes
 
 ## Example problems
 
-| Example | Details | Google Colab |
-| ------- | ----------- | ------------ |
-| [Linear Elasticity](examples/01-linear-elasticity.ipynb) | - Use grid search and the standard Metropolis-Hastings algorithm to infer model parameters. <br> - Implement `Prior`, `Likelihood`, `Posterior` and `Model` classes. <br> - Apply gradient descent with momentum to determine the best-fitting model parameters and demonstrate the limitations of point estimates. <br> - Implement a `GradientDescent` class.| <a href="https://colab.research.google.com/github/mark-hobbs/bayesian-inference-tutorial/blob/main/examples/01-linear-elasticity.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> |
-| [Linear Elasticity-Perfect Plasticity](examples/02-linear-elasticity-perfect-plasticity.ipynb) | - Use the Adaptive Metropolis-Hastings algorithm and analyse sampler performance. <br> - Implement `Sampler` and `Proposal` classes. <br> - Sample complex posterior distributions to deepen understanding.| <a href="https://colab.research.google.com/github/mark-hobbs/bayesian-inference-tutorial/blob/main/examples/02-linear-elasticity-perfect-plasticity.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> |
-| [Linear Elasticity-Linear Hardening](examples/03-linear-elasticity-linear-hardening.ipynb) | - | - |
-| Linear Elasticity-Nonlinear Hardening | - | - |
-
+| Example | Details |
+| ------- | ----------- |
+| [Linear Elasticity](examples/01-linear-elasticity.ipynb) <br> <a href="https://colab.research.google.com/github/mark-hobbs/bayesian-inference-tutorial/blob/main/examples/01-linear-elasticity.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>  | - Use grid search and the standard Metropolis-Hastings algorithm to infer model parameters. <br> - Implement `Prior`, `Likelihood`, `Posterior` and `Model` classes. <br> - Apply gradient descent with momentum to determine the best-fitting model parameters and demonstrate the limitations of point estimates. <br> - Implement a `GradientDescent` class.|
+| [Linear Elasticity-Perfect Plasticity](examples/02-linear-elasticity-perfect-plasticity.ipynb) <br> <a href="https://colab.research.google.com/github/mark-hobbs/bayesian-inference-tutorial/blob/main/examples/02-linear-elasticity-perfect-plasticity.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>  | - Use the Adaptive Metropolis-Hastings algorithm and analyse sampler performance. <br> - Implement `Sampler` and `Proposal` classes. <br> - Sample complex posterior distributions to deepen understanding.|
+| [Linear Elasticity-Linear Hardening](examples/03-linear-elasticity-linear-hardening.ipynb) | - |
+| Linear Elasticity-Nonlinear Hardening | - |
 
 There are plans to add two additional examples that explain more advanced concepts:
 
