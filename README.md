@@ -20,6 +20,21 @@ Additional resources that the reader might find useful are listed below
 
 The aim of this contribution is to explain in a straightforward manner how Bayesian inference can be used to identify material parameters of material models for solids. Bayesian approaches have already been used for this purpose, but most of the literature is not necessarily easy to understand for those new to the field. The reason for this is that most literature focuses either on complex statistical and machine learning concepts and/or on relatively complex mechanical models. In order to introduce the approach as gently as possible, we only focus on stress–strain measurements coming from uniaxial tensile tests and we only treat elastic and elastoplastic material models. Furthermore, the stress–strain measurements are created artificially in order to allow a one-to-one comparison between the true parameter values and the identified parameter distributions.
 
+## Example problems
+
+| Example | Details | Google Colab |
+| ------- | ----------- | ------------ |
+| [Linear Elasticity](examples/01-linear-elasticity.ipynb) | - Use grid search and the standard Metropolis-Hastings algorithm to infer model parameters. <br> - Implement `Prior`, `Likelihood`, `Posterior` and `Model` classes. <br> - Apply gradient descent with momentum to determine the best-fitting model parameters and demonstrate the limitations of point estimates. <br> - Implement a `GradientDescent` class.| <a href="https://colab.research.google.com/github/mark-hobbs/bayesian-inference-tutorial/blob/main/examples/01-linear-elasticity.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> |
+| [Linear Elasticity-Perfect Plasticity](examples/02-linear-elasticity-perfect-plasticity.ipynb) | - Use the Adaptive Metropolis-Hastings algorithm and analyse sampler performance. <br> - Implement `Sampler` and `Proposal` classes. <br> - Sample complex posterior distributions to deepen understanding.| <a href="https://colab.research.google.com/github/mark-hobbs/bayesian-inference-tutorial/blob/main/examples/02-linear-elasticity-perfect-plasticity.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> |
+| [Linear Elasticity-Linear Hardening](examples/03-linear-elasticity-linear-hardening.ipynb) | - | - |
+| Linear Elasticity-Nonlinear Hardening | - | - |
+
+
+There are plans to add two additional examples that explain more advanced concepts:
+
+1) Noise in both stress and strain
+2) [Model uncertainty](model-uncertainty.ipynb)
+
 ## Getting started
 
 Using [`Pipenv`](https://pipenv.pypa.io/en/latest/):
@@ -31,39 +46,6 @@ $ pipenv install
 $ pipenv shell
 $ jupyter lab
 ```
-
-## Example problems
-
-There are four examples:
-
-1) [Linear Elasticity](examples/01-linear-elasticity.ipynb)
-2) [Linear Elasticity-Perfect Plasticity](examples/02-linear-elasticity-perfect-plasticity.ipynb)
-3) [Linear Elasticity-Linear Hardening](examples/03-linear-elasticity-linear-hardening.ipynb)
-4) Linear Elasticity-Nonlinear Hardening
-
-There are plans to add two additional examples that explain more advanced concepts:
-
-1) Noise in both stress and strain
-2) [Model uncertainty](model-uncertainty.ipynb)
-
-| Example | Details | Google Colab |
-| ------- | ----------- | ------------ |
-| [Linear Elasticity](examples/01-linear-elasticity.ipynb) | - Use grid search and the standard Metropolis-Hastings algorithm to infer model parameters. <br> - Implement `Prior`, `Likelihood`, `Posterior` and `Model` classes. <br> - Apply gradient descent with momentum to determine the best-fitting model parameters and demonstrate the limitations of point estimates. <br> - Implement a `GradientDescent` class.| <a href="https://colab.research.google.com/github/mark-hobbs/PyPD/blob/main/examples/crack_branching.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> |
-| [Linear Elasticity-Perfect Plasticity](examples/02-linear-elasticity-perfect-plasticity.ipynb) | - Use the Adaptive Metropolis-Hastings algorithm and analyse sampler performance. <br> - Implement `Sampler` and `Proposal` classes. <br> - Sample complex posterior distributions to deepen understanding.| <a href="https://colab.research.google.com/github/mark-hobbs/PyPD/blob/main/examples/half_notched_beam.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> |
-| [Linear Elasticity-Linear Hardening](examples/03-linear-elasticity-linear-hardening.ipynb) | | |
-| Linear Elasticity-Nonlinear Hardening | PyMC | |
-
-
-## Core concepts
-
-The eventual plan is to write additional notebooks explaining the core concepts necessary for a proper understanding of the example problems:
-
-1) Bayesian inference
-2) Markov Chain Monte Carlo (MCMC)
-    - Standard Metropolis-Hastings algorithm
-    - The adaptive Metropolis-Hastings algorithm
-3) Posterior Predictive Distribution (PPD)
-
 
 ## Dependencies
 
